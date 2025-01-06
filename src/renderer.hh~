@@ -1,0 +1,101 @@
+/*
+
+SDG                                                                          JJ
+
+                                     Orc Horde
+
+									 Renderer
+*/
+
+#pragma once
+
+#include <vector>
+
+#include <vulkan/vulkan.h>
+#include <GLFW/glfw3.h>
+#include <optional>
+
+const uint32_t INIT_WIN_W = 800;
+const uint32_t INIT_WIN_H = 600;
+
+
+// if a struct has methods, does that make it a class?
+struct QueueFamilyIndices {
+  std::optional<uint32_t> graphicsFamily;
+  std::optional<uint32_t> presentFamily;
+
+  bool isComplete() { return graphicsFamily.has_value() && presentFamily.has_value(); }
+};
+
+const std::vector<const char*> deviceExtensions = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
+struct SwapChainSupportDetails {
+  VkSurfaceCapabilitiesKHR capabilities;
+  std::vector<VkSurfaceFormatKHR> formats;
+  std::vector<VkPresentModeKHR> presentModes;
+};
+
+class Renderer {
+public:
+  void initGraphics();
+  void initWindow();
+  bool shouldClose();
+  void getInput();
+  void cleanup();
+
+private:
+  /* props */
+  GLFWwindow *window;
+  VkInstance instance;
+  VkDebugUtilsMessengerEXT debugMessenger;
+  VkPhysicalDevice physicalDevice;
+  VkDevice device;
+  static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+    void* pUserData);
+  VkQueue graphicsQueue;
+  VkQueue presentQueue;
+  VkSurfaceKHR surface;
+  VkSwapchainKHR swapChain;
+  std::vector<VkImage> swapChainImages; // resized only on swapchain creation
+  VkFormat swapChainImageFormat;
+  VkExtent2D swapChainExtent;
+  std::vector<VkImageView> swapChainImageViews; // resized only on swapchain createinog
+
+  /* initialization functions */
+  void createInstance();
+  void setupDebugMessenger();
+  void selectPhysicalDevice();
+  void createLogicalDevice();
+  void createSurface();
+  void createSwapChain();
+  void createImageViews();
+
+  /* de-initialization functions */
+  void destroyDebugMessenger();
+
+  /* utility functions */
+  bool checkValidationLayerSupport();
+  void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+  QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+  int rateDeviceSuitability(VkPhysicalDevice device);
+  std::vector<const char *> getRequiredExtensions();
+    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+  VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
+  VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes); 
+  VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
+
+};
+
+const std::vector<const char *> validationLayers = {
+    "VK_LAYER_KHRONOS_validation"};
+
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = true;
+#endif
