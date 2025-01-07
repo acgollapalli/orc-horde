@@ -8,7 +8,16 @@ if [ ! -d "build" ]; then
 	mkdir build
 fi
 
+# compile shaders
+echo "\n----COMPILING SHADERS---\n"
+./compile_shaders.sh
+
+# compile game
+echo "\n---COMPILING GAME---\n"
 cd build
 cmake ..
-../compile_shaders.sh
-cmake --build
+cmake --build .
+
+if [ "$1" = 'run' ]; then
+	./orc_horde
+fi

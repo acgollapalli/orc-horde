@@ -7,8 +7,13 @@ SDG                                                                          JJ
 
 #include <iostream>
 #include <stdexcept>
+#include <chrono>
 
 #include "renderer.hh"
+
+using namespace std::literals;
+
+std::chrono::duration MIN_FRAME_TIME = 1ms;
 
 int main (int argc, char *argv[]) {
   Renderer renderer;
@@ -16,10 +21,15 @@ int main (int argc, char *argv[]) {
   try {
 	renderer.initWindow();
     renderer.initGraphics();
-	//
+
+	auto prev_frame = std::chrono::high_resolution_clock::now();
+
     while (!renderer.shouldClose()) {
-	  renderer.getInput();
-	  renderer.drawFrame();
+	  auto current_frame = std::chrono::high_resolution_clock::now();
+	  if ((current_frame - prev_frame) > MIN_FRAME_TIME) {
+		renderer.getInput();
+		renderer.drawFrame();
+	  }
     }
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;

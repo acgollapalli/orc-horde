@@ -3,6 +3,7 @@
 # TODO: write compile_shaders.bat
 
 cd $(dirname "$SCRIPT")
+echo $(pwd)
 
 if [ ! -d "build" ]; then
 	mkdir build

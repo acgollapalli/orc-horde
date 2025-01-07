@@ -19,6 +19,7 @@ SDG                                                                          JJ
 const uint32_t INIT_WIN_W = 800;
 const uint32_t INIT_WIN_H = 600;
 
+const int MAX_FRAMES_IN_FLIGHT = 2;
 
 // if a struct has methods, does that make it a class?
 struct QueueFamilyIndices {
@@ -72,10 +73,12 @@ private:
   VkPipeline graphicsPipeline;
   std::vector<VkFramebuffer> swapChainFramebuffers;
   VkCommandPool commandPool;
-  VkCommandBuffer commandBuffer;
-  VkSemaphore imageAvailableSemaphore;
-  VkSemaphore renderFinishedSemaphore;
-  VkFence inFlightFence;
+  std::vector<VkCommandBuffer> commandBuffers;
+  std::vector<VkSemaphore> imageAvailableSemaphores;
+  std::vector<VkSemaphore> renderFinishedSemaphores;
+  std::vector<VkFence> inFlightFences;
+  uint32_t currentFrame = 0;
+  bool framebufferResized = false;
 
   /* initialization functions */
   void createInstance();
@@ -89,11 +92,18 @@ private:
   void createGraphicsPipeline();
   void createFramebuffers();
   void createCommandPool();
-  void createCommandBuffer();
+  void createCommandBuffers();
   void createSyncObjects();
+  void initVulkan();
+
+  /* handling things like resizes */
+  void recreateSwapChain();
+  static void framebufferResizeCallback(GLFWwindow *window,int width, int height);
+	
 
   /* de-initialization functions */
-  void destroyDebugMessenger();
+  void cleanupSwapChain();
+  //  void destroyDebugMessenger();
 
   /* utility functions */
   bool checkValidationLayerSupport();
@@ -107,7 +117,6 @@ private:
   VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
   VkShaderModule createShaderModule(const std::vector<char> &byteCode);
   void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-	
 };
 
 const std::vector<const char *> validationLayers = {
