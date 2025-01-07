@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# abort if any command fails
+set -e
+
 # TODO: write build.bat
 
 cd $(dirname "$SCRIPT")
