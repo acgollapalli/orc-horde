@@ -9,7 +9,6 @@ SDG                                                                          JJ
 
 #pragma once
 
-#include <vector>
 
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
@@ -17,6 +16,10 @@ SDG                                                                          JJ
 #include <fstream>
 #include <glm/glm.hpp>
 #include <array>
+#include <vector>
+
+#define stb_image_implementation
+#include "vendor/stb_image.h"
 
 const uint32_t INIT_WIN_W = 800;
 const uint32_t INIT_WIN_H = 600;
@@ -51,6 +54,12 @@ struct Vertex {
 
 	return attributeDescriptions;
   }
+};
+
+struct UniformBufferObject {
+  glm::mat4 model;
+  glm::mat4 view;
+  glm::mat4 proj;
 };
 
 // if a struct has methods, does that make it a class?
@@ -102,6 +111,7 @@ struct SwapChainSupportDetails {
     std::vector<VkImageView>
         swapChainImageViews; // resized only on swapchain createinog
     VkRenderPass renderPass;
+	VkDescriptorSetLayout descriptorSetLayout;
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
     std::vector<VkFramebuffer> swapChainFramebuffers;
@@ -121,6 +131,11 @@ struct SwapChainSupportDetails {
     VkDeviceMemory vertexBufferMemory;
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
+	std::vector<VkBuffer> uniformBuffers;
+	std::vector<VkDeviceMemory> uniformBuffersMemory;
+	std::vector<void*> uniformBuffersMapped;
+	VkDescriptorPool descriptorPool;
+	std::vector<VkDescriptorSet> descriptorSets;
 
     /* initialization functions */
     void createInstance();
@@ -131,11 +146,16 @@ struct SwapChainSupportDetails {
     void createSwapChain();
     void createImageViews();
     void createRenderPass();
+	void createDescriptorSetLayout();
     void createGraphicsPipeline();
     void createFramebuffers();
     void createCommandPool();
+	void createTextureImage();
 	void createVertexBuffer();
 	void createIndexBuffer();
+	void createUniformBuffers();
+	void createDescriptorPool();
+	void createDescriptorSets();
     void createCommandBuffers();
     void createSyncObjects();
     void initVulkan();
@@ -165,6 +185,7 @@ struct SwapChainSupportDetails {
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void updateUniformBuffer(uint32_t currentImage);
 };
 
 const std::vector<const char *> validationLayers = {
