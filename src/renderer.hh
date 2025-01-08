@@ -18,9 +18,6 @@ SDG                                                                          JJ
 #include <array>
 #include <vector>
 
-#define stb_image_implementation
-#include "vendor/stb_image.h"
-
 const uint32_t INIT_WIN_W = 800;
 const uint32_t INIT_WIN_H = 600;
 
@@ -29,6 +26,7 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 struct Vertex {
   glm::vec2 pos;
   glm::vec3 color;
+  glm::vec2 texCoord;
 
   static VkVertexInputBindingDescription getBindingDescription() {
     VkVertexInputBindingDescription bindingDescription{};
@@ -38,8 +36,8 @@ struct Vertex {
     return bindingDescription;
   }
 
-  static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
-    std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions {};
+  static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
+    std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions {};
 	// positions
 	attributeDescriptions[0].binding = 0;
 	attributeDescriptions[0].location = 0;
@@ -51,6 +49,12 @@ struct Vertex {
 	attributeDescriptions[1].location = 1;
 	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 	attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+	// textures
+	attributeDescriptions[2].binding = 0;
+	attributeDescriptions[2].location = 2;
+	attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
 
 	return attributeDescriptions;
   }
@@ -122,10 +126,10 @@ struct SwapChainSupportDetails {
     std::vector<VkFence> inFlightFences;
     uint32_t currentFrame = 0;
     bool framebufferResized = false;
-    const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-                                          {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-                                          {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-                                          {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+    const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+                                          {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+                                          {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+                                          {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
     const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 	VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
@@ -136,6 +140,10 @@ struct SwapChainSupportDetails {
 	std::vector<void*> uniformBuffersMapped;
 	VkDescriptorPool descriptorPool;
 	std::vector<VkDescriptorSet> descriptorSets;
+	VkImage textureImage;
+	VkDeviceMemory textureImageMemory;
+	VkImageView textureImageView;
+	VkSampler textureSampler;
 
     /* initialization functions */
     void createInstance();
@@ -151,6 +159,8 @@ struct SwapChainSupportDetails {
     void createFramebuffers();
     void createCommandPool();
 	void createTextureImage();
+	void createTextureImageView();
+	void createTextureSampler();
 	void createVertexBuffer();
 	void createIndexBuffer();
 	void createUniformBuffers();
@@ -162,8 +172,7 @@ struct SwapChainSupportDetails {
 
     /* handling things like resizes */
     void recreateSwapChain();
-    static void framebufferResizeCallback(GLFWwindow *window, int width,
-                                          int height);
+    static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 
     /* de-initialization functions */
     void cleanupSwapChain();
@@ -186,6 +195,14 @@ struct SwapChainSupportDetails {
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 	void updateUniformBuffer(uint32_t currentImage);
+	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling , VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+	VkImageView createImageView(VkImage image, VkFormat format);
+	  
+	  
 };
 
 const std::vector<const char *> validationLayers = {

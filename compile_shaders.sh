@@ -1,5 +1,9 @@
 #!/bin/sh
 
+
+# abort if any command fails
+set -e
+
 # TODO: write compile_shaders.bat
 
 cd $(dirname "$SCRIPT")
