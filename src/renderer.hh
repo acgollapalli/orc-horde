@@ -19,10 +19,18 @@ SDG                                                                          JJ
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_RADIANS
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
+#include <glm/gtx/hash.hpp>
 
 const uint32_t INIT_WIN_W = 800;
 const uint32_t INIT_WIN_H = 600;
+
+//const std::string MODEL_PATH = "../models/maneki_neko/source/neko.obj";
+//const std::string TEXTURE_PATH = "../models/maneki_neko/textures/neko.png";
+
+const std::string MODEL_PATH = "../models/viking_room/viking_room.obj";
+const std::string TEXTURE_PATH = "../models/viking_room/viking_room.png";
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -61,7 +69,24 @@ struct Vertex {
 
 	return attributeDescriptions;
   }
+
+
+  bool operator==(const Vertex& other) const {
+    return pos == other.pos &&
+	  color == other.color &&
+	  texCoord == other.texCoord;
+  }
 };
+
+namespace std {
+    template<> struct hash<Vertex> {
+        size_t operator()(Vertex const& vertex) const {
+            return ((hash<glm::vec3>()(vertex.pos) ^
+                   (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
+                   (hash<glm::vec2>()(vertex.texCoord) << 1);
+        }
+    };
+}
 
 struct UniformBufferObject {
   glm::mat4 model;
@@ -129,17 +154,8 @@ struct SwapChainSupportDetails {
     std::vector<VkFence> inFlightFences;
     uint32_t currentFrame = 0;
     bool framebufferResized = false;
-    const std::vector<Vertex> vertices = {{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-                                          {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-                                          {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-                                          {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-										  {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-                                          {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-                                          {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-                                          {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
-    const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0,
-										   4, 5, 6, 6, 7, 4};
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
 	VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
 	VkBuffer indexBuffer;
@@ -186,6 +202,9 @@ struct SwapChainSupportDetails {
     /* handling things like resizes */
     void recreateSwapChain();
     static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
+
+	/* utility functions that will definitely change*/
+	void loadModel();
 
     /* de-initialization functions */
     void cleanupSwapChain();

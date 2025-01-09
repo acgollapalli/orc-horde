@@ -10,15 +10,16 @@ SDG                                                                          JJ
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
-#include <iostream>
-#include <stdexcept>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
-#include <set>
-#include <limits>
 #include <algorithm>
 #include <chrono>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <limits>
+#include <set>
+#include <stdexcept>
+#include <unordered_map>
+#include <vector>
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_RADIANS
@@ -27,6 +28,9 @@ SDG                                                                          JJ
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "vendor/stb_image.h"
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "vendor/tiny_obj_loader.h"
 
 #include "renderer.hh"
 
@@ -99,6 +103,7 @@ void Renderer::initVulkan() {
   createTextureImage();
   createTextureImageView();
   createTextureSampler();
+  loadModel();
   createVertexBuffer();
   createIndexBuffer();
   createUniformBuffers();
@@ -812,7 +817,7 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
   vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
   VkBuffer indexBuffers[] = {indexBuffer};
-  vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+  vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
   vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
 
@@ -902,7 +907,7 @@ void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkI
 
 void Renderer::createTextureImage() {
   int texWidth, texHeight, texChannels;
-  stbi_uc *pixels = stbi_load("../textures/truck-kun-leaflit.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+  stbi_uc *pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
   VkDeviceSize imageSize = texWidth * texHeight * 4;
   
   if (!pixels) {
@@ -961,6 +966,46 @@ void Renderer::createTextureSampler() {
 
   if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
 	throw std::runtime_error("failed to create texture sampler!");
+  }
+}
+
+void Renderer::loadModel() {
+  tinyobj::attrib_t attrib;
+  std::vector<tinyobj::shape_t> shapes;
+  std::vector<tinyobj::material_t> materials;
+  std::string err;
+
+  if (!tinyobj::LoadObj(&attrib, &shapes, &materials,
+						 &err, MODEL_PATH.c_str())) {
+	throw std::runtime_error(err);
+  }
+
+  std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+
+  for (const auto &shape : shapes) {
+	for (const auto &index : shape.mesh.indices) {
+	  Vertex vertex{};
+
+	  vertex.pos = {
+		attrib.vertices[3 * index.vertex_index + 0],
+		attrib.vertices[3 * index.vertex_index + 1],
+		attrib.vertices[3 * index.vertex_index + 2]
+	  };
+
+	  vertex.texCoord = {
+		attrib.texcoords[2 * index.texcoord_index + 0],
+		1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+	  };
+
+	  vertex.color = {1.0f, 1.0f, 1.0f};
+
+	  if (uniqueVertices.count(vertex) == 0) {
+		uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+		vertices.push_back(vertex);
+	  }
+
+	  indices.push_back(uniqueVertices[vertex]);
+	}
   }
 }
 
