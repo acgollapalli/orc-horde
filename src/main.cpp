@@ -29,6 +29,7 @@ int main (int argc, char *argv[]) {
 	  if ((current_frame - prev_frame) > MIN_FRAME_TIME) {
 		renderer.getInput();
 		renderer.drawFrame();
+		prev_frame = current_frame;
 	  }
     }
   } catch (const std::exception &e) {
