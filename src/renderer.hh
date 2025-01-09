@@ -9,14 +9,17 @@ SDG                                                                          JJ
 
 #pragma once
 
+#include <array>
+#include <fstream>
+#include <optional>
+#include <vector>
 
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
-#include <optional>
-#include <fstream>
+
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
-#include <array>
-#include <vector>
 
 const uint32_t INIT_WIN_W = 800;
 const uint32_t INIT_WIN_H = 600;
@@ -24,7 +27,7 @@ const uint32_t INIT_WIN_H = 600;
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 struct Vertex {
-  glm::vec2 pos;
+  glm::vec3 pos;
   glm::vec3 color;
   glm::vec2 texCoord;
 
@@ -41,7 +44,7 @@ struct Vertex {
 	// positions
 	attributeDescriptions[0].binding = 0;
 	attributeDescriptions[0].location = 0;
-	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
 	attributeDescriptions[0].offset = offsetof(Vertex, pos);
 
 	// colors
@@ -126,11 +129,17 @@ struct SwapChainSupportDetails {
     std::vector<VkFence> inFlightFences;
     uint32_t currentFrame = 0;
     bool framebufferResized = false;
-    const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-                                          {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-                                          {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-                                          {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
-    const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+    const std::vector<Vertex> vertices = {{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+                                          {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+                                          {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+                                          {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+
+										  {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+                                          {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+                                          {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+                                          {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
+    const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0,
+										   4, 5, 6, 6, 7, 4};
 	VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
 	VkBuffer indexBuffer;
@@ -144,6 +153,9 @@ struct SwapChainSupportDetails {
 	VkDeviceMemory textureImageMemory;
 	VkImageView textureImageView;
 	VkSampler textureSampler;
+	VkImage depthImage;
+	VkDeviceMemory depthImageMemory;
+	VkImageView depthImageView;
 
     /* initialization functions */
     void createInstance();
@@ -156,8 +168,9 @@ struct SwapChainSupportDetails {
     void createRenderPass();
 	void createDescriptorSetLayout();
     void createGraphicsPipeline();
-    void createFramebuffers();
     void createCommandPool();
+	void createDepthResources();
+    void createFramebuffers();
 	void createTextureImage();
 	void createTextureImageView();
 	void createTextureSampler();
@@ -200,9 +213,10 @@ struct SwapChainSupportDetails {
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-	VkImageView createImageView(VkImage image, VkFormat format);
-	  
-	  
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+	VkFormat findDepthFormat();
+	bool hasStencilComponent(VkFormat format);
 };
 
 const std::vector<const char *> validationLayers = {
