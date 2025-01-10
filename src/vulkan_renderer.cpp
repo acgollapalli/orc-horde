@@ -273,6 +273,7 @@ void Renderer::createLogicalDevice() {
 
   VkPhysicalDeviceFeatures deviceFeatures{};
   deviceFeatures.samplerAnisotropy = VK_TRUE;
+  deviceFeatures.sampleRateShading = VK_TRUE;
 
   VkDeviceCreateInfo createInfo {};
   createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -623,9 +624,9 @@ void Renderer::createGraphicsPipeline() {
 
   VkPipelineMultisampleStateCreateInfo multisampling {};
   multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-  multisampling.sampleShadingEnable = VK_FALSE;
+  multisampling.sampleShadingEnable = VK_TRUE;
   multisampling.rasterizationSamples = msaaSamples;
-  multisampling.minSampleShading = 1.0f;
+  multisampling.minSampleShading = 0.2f;
   multisampling.pSampleMask = nullptr;
   multisampling.alphaToCoverageEnable = VK_FALSE;
   multisampling.alphaToOneEnable = VK_FALSE;
@@ -1627,14 +1628,14 @@ int Renderer::rateDeviceSuitability(VkPhysicalDevice device) {
   // If the GPU does not have a graphics queue family, the GPU is unsuitable (return 0)
   if (QueueFamilyIndices indices = findQueueFamilies(device); !indices.isComplete()) return 0;
 
-
   // if the GPU does not have the required extensions, the GPU is unsuitable (return 0)
   if (!checkDeviceExtensionSupport(device)) return 0;
 
   // if the GPU does not have the required features, the GPU is unsuitable (return 0)
   VkPhysicalDeviceFeatures supportedFeatures;
   vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
-  if (!supportedFeatures.samplerAnisotropy) return 0;
+  if (!(supportedFeatures.samplerAnisotropy &&
+		supportedFeatures.sampleRateShading)) return 0;
 
   // if the GPU does not have swap chain support, the GPU is unsuitable (return 0)
   SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
