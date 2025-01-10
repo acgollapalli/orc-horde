@@ -173,6 +173,10 @@ struct SwapChainSupportDetails {
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
 	VkImageView depthImageView;
+	VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
+	VkImage colorImage;
+	VkDeviceMemory colorImageMemory;
+	VkImageView colorImageView;
 
     /* initialization functions */
     void createInstance();
@@ -186,6 +190,7 @@ struct SwapChainSupportDetails {
 	void createDescriptorSetLayout();
     void createGraphicsPipeline();
     void createCommandPool();
+	void createColorResources();
 	void createDepthResources();
     void createFramebuffers();
 	void createTextureImage();
@@ -228,7 +233,7 @@ struct SwapChainSupportDetails {
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 	void updateUniformBuffer(uint32_t currentImage);
-	void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling , VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+	void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling , VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
@@ -238,7 +243,7 @@ struct SwapChainSupportDetails {
 	VkFormat findDepthFormat();
 	bool hasStencilComponent(VkFormat format);
 	void generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
-	  
+	VkSampleCountFlagBits getMaxUsableSampleCount();
 };
 
 const std::vector<const char *> validationLayers = {
