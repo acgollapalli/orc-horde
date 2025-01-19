@@ -11,6 +11,9 @@ if [ ! -d "build" ]; then
 	mkdir build
 fi
 
+export CC=/usr/bin/gcc-14
+export CXX=/usr/bin/g++-14
+
 # compile shaders
 echo "\n----COMPILING SHADERS---\n"
 ./compile_shaders.sh

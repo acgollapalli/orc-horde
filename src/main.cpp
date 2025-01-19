@@ -10,10 +10,17 @@ SDG                                                                          JJ
 #include <chrono>
 
 #include "renderer.hh"
+#include "game_object.hh"
 
 using namespace std::literals;
 
 std::chrono::duration MIN_FRAME_TIME = 1ms;
+
+void drawDemoFrame(Renderer &renderer) {
+  AssetStore *assetStore = new AssetStore(renderer);
+
+}
+
 
 int main (int argc, char *argv[]) {
   Renderer renderer;
@@ -28,7 +35,8 @@ int main (int argc, char *argv[]) {
 	  auto current_frame = std::chrono::high_resolution_clock::now();
 	  if ((current_frame - prev_frame) > MIN_FRAME_TIME) {
 		renderer.getInput();
-		renderer.drawFrame();
+		// TODO(caleb): replace with drawFrame with renderOps
+		//renderer.drawFrame(); 
 		prev_frame = current_frame;
 	  }
     }
