@@ -63,7 +63,7 @@ Texture *AssetStore::get_texture(GUID guid) {
 	return static_cast<Texture *>(info.asset);
   } else {
 	assetDb[guid].asset = new Texture(guid, *this, renderer);
-	return assetDb[guid].asset;
+	return static_cast<Texture *>(assetDb[guid].asset);
   }
 }
 
@@ -81,7 +81,7 @@ Mesh *AssetStore::get_mesh(GUID guid) {
 	return static_cast<Mesh *>(info.asset);
   } else {
 	assetDb[guid].asset = new Mesh(guid, *this, renderer);
-	return assetDb[guid].asset;
+	return static_cast<Mesh *>(assetDb[guid].asset);
   }
 }
 

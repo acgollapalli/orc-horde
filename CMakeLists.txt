@@ -7,8 +7,9 @@ project(Orc_Horde
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD ON)
-set(CXX_FLAGS "-fpermissive")
+set(CXX_FLAGS "-fpermissive /permissive /EHsc")
 set(CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
 add_executable(orc_horde src/main.cpp
