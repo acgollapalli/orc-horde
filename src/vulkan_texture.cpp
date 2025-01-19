@@ -13,7 +13,8 @@ Texture::Texture(GUID guid, AssetStore &assetstore, Renderer &renderer)
   : Asset(guid, assetStore, renderer)
 {}
 
-void Texture::load(){}
+// TODO(caleb): implement all these
+bool Texture::load(){ return true; }
 void Texture::unload(){}
 void Texture::loadLOD(LOD lod){}
 void Texture::loadLOD(LOD lod[]){}

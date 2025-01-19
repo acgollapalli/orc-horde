@@ -23,17 +23,23 @@ public:
   //~GameObject();
 
   virtual void update() = 0;
-  virtual void display() = 0;
+  virtual RenderOp display() = 0;
   virtual void move() = 0;
 private:
   skyVec3 position;
 };
 
 class RigidBody : public GameObject {
+public:
   RigidBody(skyVec3 position, skyVec3 rotation, float scale,
 			GUID textureId, GUID meshId, AssetStore &assetStore);
-  ~RigidBody();
+  //~RigidBody();
+  void update();
+  RenderOp display();
+  void move();
+  bool load();
 private:
+  // TODO(caleb): add private copy constructor
   skyVec3 rotation;
   float scale;
   Mesh *mesh;
@@ -41,9 +47,11 @@ private:
 };
 
 class Decorator : public GameObject {
+public:
   Decorator(skyVec3 position, float scale, Texture texture);
   ~Decorator();
 private:
+  // TODO(caleb): add private copy constructor
   float scale;
   Mesh *mesh;
   Texture *texture;
@@ -62,8 +70,21 @@ RigidBody::RigidBody(skyVec3 position, skyVec3 rotation, float scale,
   mesh = assetStore.get_mesh(meshId);
 }
 
-
-
+void RigidBody::update(){}
+RenderOp RigidBody::display(){
+  return mesh->display();
+}
+void RigidBody::move(){}
+bool RigidBody::load() {
+  bool textureLoaded, meshLoaded = true;
+  if (texture != nullptr) {
+	textureLoaded = texture->load();
+  }
+  if (mesh != nullptr) {
+	meshLoaded = mesh->load();
+  }
+  return (textureLoaded && meshLoaded);
+}
 
 
   

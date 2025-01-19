@@ -557,8 +557,8 @@ void Renderer:: createDescriptorSetLayout() {
 }
 
 void Renderer::createGraphicsPipeline() {
-  auto vertShaderByteCode = readBinAsset("shaders/triangle_vert.spv");
-  auto fragShaderByteCode = readBinAsset("shaders/triangle_frag.spv");
+  auto vertShaderByteCode = readBinAsset("shaders/base_vert.spv");
+  auto fragShaderByteCode = readBinAsset("shaders/base_frag.spv");
   
   VkShaderModule vertShaderModule = createShaderModule(vertShaderByteCode);
   VkShaderModule fragShaderModule = createShaderModule(fragShaderByteCode);

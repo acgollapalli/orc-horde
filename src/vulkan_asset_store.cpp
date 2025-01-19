@@ -51,8 +51,13 @@ Asset *AssetStore::get(GUID guid) {
 }
 
 Texture *AssetStore::get_texture(GUID guid) {
-  AssetInfo info = assetDb.at(guid);
-  assert(info.type == Texture_e);
+  AssetInfo info;
+  try {
+	info = assetDb.at(guid);
+	assert(info.type == Texture_e);
+  } catch (const std::out_of_range& ex) {
+	return nullptr; // TODO: remove this eventually
+  }
 
   if (info.asset != nullptr) {
 	return static_cast<Texture *>(info.asset);
@@ -63,8 +68,14 @@ Texture *AssetStore::get_texture(GUID guid) {
 }
 
 Mesh *AssetStore::get_mesh(GUID guid) {
-  AssetInfo info = assetDb.at(guid);
-  assert(info.type == Mesh_e);
+  AssetInfo info;
+  try {
+	info = assetDb.at(guid);
+	assert(info.type == Mesh_e);
+  } catch (const std::out_of_range& ex) {
+	return nullptr; // TODO: remove this eventually
+  }
+
 
   if (info.asset != nullptr) {
 	return static_cast<Mesh *>(info.asset);
@@ -79,5 +90,4 @@ AssetLocation AssetStore::getLocation(GUID guid) {
   // with AssetLocationType on it?
   AssetInfo info = assetDb.at(guid);
   return info.assetLocation;
-  
 }

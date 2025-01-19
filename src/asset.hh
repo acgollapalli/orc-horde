@@ -89,8 +89,8 @@ public:
   // copying all that data around
   
   GUID 					guid;
-  virtual void 			load();   // TODO: maybe this doesn't need to be virtual
-  virtual void			unload(); // TODO: maybe this doesn't have to be virtual either
+  virtual bool 			load() = 0;   // TODO: maybe this doesn't need to be virtual
+  virtual void			unload() = 0; // TODO: maybe this doesn't have to be virtual either
   friend class AssetStore;
 protected:
   bool 					loaded;
@@ -108,7 +108,7 @@ protected:
 class Texture : public Asset {
 public:
   //  ~Texture();
-  void              load();
+  bool              load();
   void				unload();
   void              loadLOD(LOD lod);
   void              loadLOD(LOD lod[]);
@@ -127,10 +127,11 @@ class Mesh : public Asset {
 public:
   //~Mesh();
 
-  void              		load();
+  bool              		load();
   void						load(LOD lod);
   void						unload();
   void						unload(LOD lod);
+  RenderOp					display();
   friend class AssetStore;
   
 private:

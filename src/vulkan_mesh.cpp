@@ -13,7 +13,7 @@ Mesh::Mesh(GUID guid, AssetStore &assetstore, Renderer &renderer)
   : Asset(guid, assetStore, renderer)
 {}
 
-void Mesh::load() {
+bool Mesh::load() {
   if (loaded) return;
 
   std::string modelPath = assetStore.getLocation(guid);
@@ -61,6 +61,7 @@ void Mesh::load() {
 
   renderer.createVertexBuffer(vertices, vertices_st.buffer, vertices_st.memory);
   renderer.createIndexBuffer(indices, indices_st.buffer, indices_st.memory);
+  return true;
 }
 
 void Mesh::unload() {
@@ -75,3 +76,12 @@ void Mesh::unload() {
 
 void	Mesh::load(LOD lod) {}
 void	Mesh::unload(LOD lod){}
+
+RenderOp Mesh::display () {
+  return RenderOp {
+	.type = DrawMeshSimple,
+	.vertexBuffer = vertices_st.buffer,
+	.indexBuffer = indices_st.buffer,
+	.instanceBuffer = {},
+  };
+}

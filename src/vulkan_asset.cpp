@@ -31,7 +31,3 @@ Asset::Asset(GUID guid, AssetStore &assetStore, Renderer &renderer)
 Asset::~Asset() {
   //if (loaded) unload(); // we MAY actually just want to have this in AssetStore instead
 }
-
-void Asset::load() {}
-void Asset::unload() {}
-
