@@ -9,12 +9,12 @@ SDG                                                                             
 
 #include "asset.hh"
 
-Mesh::Mesh(GUID guid, AssetStore &assetstore, Renderer &renderer)
+Mesh::Mesh(GUID guid, AssetStore &assetStore, Renderer &renderer)
   : Asset(guid, assetStore, renderer)
 {}
 
 bool Mesh::load() {
-  if (loaded) return;
+  if (loaded) return true;
 
   std::string modelPath = assetStore.getLocation(guid);
 
@@ -59,6 +59,8 @@ bool Mesh::load() {
 	}
   }
 
+  vertices_st.size = static_cast<uint32_t>(vertices.size()); // not currently used
+  indices_st.size = static_cast<uint32_t>(indices.size());
   renderer.createVertexBuffer(vertices, vertices_st.buffer, vertices_st.memory);
   renderer.createIndexBuffer(indices, indices_st.buffer, indices_st.memory);
   return true;
@@ -82,6 +84,7 @@ RenderOp Mesh::display () {
 	.type = DrawMeshSimple,
 	.vertexBuffer = vertices_st.buffer,
 	.indexBuffer = indices_st.buffer,
+	.numIndices = indices_st.size,
 	.instanceBuffer = {},
   };
 }

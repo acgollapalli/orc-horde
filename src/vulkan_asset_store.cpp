@@ -88,6 +88,7 @@ Mesh *AssetStore::get_mesh(GUID guid) {
 AssetLocation AssetStore::getLocation(GUID guid) {
   // TODO(caleb): AssetLocation is a string, should it be a struct
   // with AssetLocationType on it?
-  AssetInfo info = assetDb.at(guid);
+  std::printf("\n\n\n assetDb size: %d \n\n\n", (assetDb.size()));
+  AssetInfo info = assetDb[guid];
   return info.assetLocation;
 }

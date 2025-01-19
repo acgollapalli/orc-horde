@@ -9,7 +9,7 @@ SDG                                                                             
 
 #include "asset.hh"
 
-Texture::Texture(GUID guid, AssetStore &assetstore, Renderer &renderer)
+Texture::Texture(GUID guid, AssetStore &assetStore, Renderer &renderer)
   : Asset(guid, assetStore, renderer)
 {}
 

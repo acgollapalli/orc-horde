@@ -44,6 +44,7 @@ struct RenderOp {
   RenderOpType type;
   VkBuffer vertexBuffer;
   VkBuffer indexBuffer;
+  uint32_t numIndices;
   VkBuffer instanceBuffer;
 };
 
@@ -215,6 +216,8 @@ private:
   VkDescriptorSetLayout descriptorSetLayout;
   VkPipelineLayout pipelineLayout;
   VkPipeline graphicsPipeline;
+  VkPipelineLayout instancedPipelineLayout;
+  VkPipeline instancedGraphicsPipeline;
   std::vector<VkFramebuffer> swapChainFramebuffers;
   VkCommandPool commandPool;
   std::vector<VkCommandBuffer> commandBuffers;
@@ -223,12 +226,6 @@ private:
   std::vector<VkFence> inFlightFences;
   uint32_t currentFrame = 0;
   bool framebufferResized = false;
-  std::vector<Vertex> vertices;
-  std::vector<uint32_t> indices;
-  VkBuffer vertexBuffer;
-  VkDeviceMemory vertexBufferMemory;
-  VkBuffer indexBuffer;
-  VkDeviceMemory indexBufferMemory;
   std::vector<VkBuffer> uniformBuffers;
   std::vector<VkDeviceMemory> uniformBuffersMemory;
   std::vector<void*> uniformBuffersMapped;
@@ -258,6 +255,7 @@ private:
   void createRenderPass();
   void createDescriptorSetLayout();
   void createGraphicsPipeline();
+  void createInstancedGraphicsPipeline();
   void createCommandPool();
   void createColorResources();
   void createDepthResources();

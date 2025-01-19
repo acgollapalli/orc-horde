@@ -19,6 +19,7 @@ SDG                                                                             
 struct VulkanBufferInfo {
   VkBuffer buffer;
   VkDeviceMemory memory;
+  uint32_t size;
 };
 
 typedef VulkanBufferInfo VertexBuffer_st;
@@ -74,7 +75,7 @@ public:
   AssetLocation 			getLocation(GUID guid); // SUBJECT TO CHANGEs
 
 private:
-  AssetDB					assetDb;
+  AssetDB			        assetDb;
   Renderer & 				renderer;
 };
 

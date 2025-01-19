@@ -557,8 +557,8 @@ void Renderer:: createDescriptorSetLayout() {
 }
 
 void Renderer::createGraphicsPipeline() {
-  auto vertShaderByteCode = readBinAsset("shaders/base_vert.spv");
-  auto fragShaderByteCode = readBinAsset("shaders/base_frag.spv");
+  auto vertShaderByteCode = readBinAsset("shaders/triangle_vert.spv");
+  auto fragShaderByteCode = readBinAsset("shaders/triangle_frag.spv");
   
   VkShaderModule vertShaderModule = createShaderModule(vertShaderByteCode);
   VkShaderModule fragShaderModule = createShaderModule(fragShaderByteCode);
@@ -587,18 +587,18 @@ void Renderer::createGraphicsPipeline() {
   dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
   dynamicState.pDynamicStates = dynamicStates.data();
   
-  std::array<VkVertexInputBindingDescription, 2> bindingDescriptions {
+  std::vector<VkVertexInputBindingDescription> bindingDescriptions {
 	Vertex::getBindingDescription(),
-	Instance::getBindingDescription()
+	//Instance::getBindingDescription()
   };
-  
+
   std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
   for (const auto& description : Vertex::getAttributeDescriptions()) {
 	attributeDescriptions.push_back(description);
   }
-  for (const auto& description : Instance::getAttributeDescriptions()) {
-	attributeDescriptions.push_back(description);
-  }
+  //for (const auto& description : Instance::getAttributeDescriptions()) {
+  //	attributeDescriptions.push_back(description);
+  //}
   
   VkPipelineVertexInputStateCreateInfo vertexInputInfo{
 	.sType = 							VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -881,32 +881,31 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	//Vkcmddraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 	switch (op.type) {
 	case DrawMeshSimple: {
+	  std::printf("\n\n\nDRAWING SIMPLE MESH\n\n\n");
 	  VkBuffer vertexBuffers[] = {op.vertexBuffer};
 	  VkDeviceSize offsets[] = {0};
 	  vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 	  
-	  VkBuffer indexBuffers[] = {op.indexBuffer};
-	  vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+	  vkCmdBindIndexBuffer(commandBuffer, op.indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 	  
 	  vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 							  pipelineLayout, 0, 1,
 							  &descriptorSets[currentFrame], 0, nullptr);
 	  
-	  vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+	  vkCmdDrawIndexed(commandBuffer, op.numIndices, 1, 0, 0, 0);
 	} break;
 	case DrawMeshInstanced: {	// 
 	  VkBuffer vertexBuffers[] = {op.vertexBuffer, op.instanceBuffer};
 	  VkDeviceSize offsets[] = {0, 0};
 	  vkCmdBindVertexBuffers(commandBuffer, 0, 2, vertexBuffers, offsets);
 	  
-	  VkBuffer indexBuffers[] = {op.indexBuffer};
-	  vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+	  vkCmdBindIndexBuffer(commandBuffer, op.indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 	  
 	  vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 							  pipelineLayout, 0, 1,
 							  &descriptorSets[currentFrame], 0, nullptr);
 	  
-	  vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+	  vkCmdDrawIndexed(commandBuffer, op.numIndices, 1, 0, 0, 0);
 	} break;
 	}
   }
@@ -1603,12 +1602,6 @@ void Renderer::cleanup() {
   vkDestroyDescriptorPool(device, descriptorPool, nullptr);
   
   vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-  
-  vkDestroyBuffer(device, vertexBuffer, nullptr);
-  vkFreeMemory(device, vertexBufferMemory, nullptr);
-  
-  vkDestroyBuffer(device, indexBuffer, nullptr);
-  vkFreeMemory(device, indexBufferMemory, nullptr);
   
   vkDestroyPipeline(device, graphicsPipeline, nullptr);
   vkDestroyPipelineLayout(device, pipelineLayout, nullptr);

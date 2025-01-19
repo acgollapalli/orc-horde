@@ -20,6 +20,7 @@ Asset::Asset(GUID guid, AssetStore &assetStore, Renderer &renderer)
   ,renderer(renderer)
   ,loaded(false) // do we need this?
 {
+
   // do something here
   // RAII is the C++ thing, so maybe we should acquire the asset from a file?
   // or should we provide explicit loading and caching semantics?

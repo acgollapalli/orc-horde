@@ -16,7 +16,8 @@ add_executable(orc_horde src/main.cpp
 						 src/vulkan_asset_store.cpp
 						 src/vulkan_asset.cpp
 						 src/vulkan_mesh.cpp
-						 src/vulkan_texture.cpp)
+						 src/vulkan_texture.cpp
+						 src/rigid_body.cpp)
 
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)

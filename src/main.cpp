@@ -20,7 +20,7 @@ struct GameState {
   std::vector<RigidBody> gameObjects;
 };
 
-GameState initGameState(Renderer &renderer) {
+GameState initGameState(Renderer &renderer) {;
   AssetStore *assetStore = new AssetStore(renderer);
   auto position = skyVec3{0.0,0.0,0.0};
   auto rotation = skyVec3{0.0,0.0,0.0};

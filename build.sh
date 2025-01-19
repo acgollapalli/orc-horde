@@ -21,7 +21,7 @@ echo "\n----COMPILING SHADERS---\n"
 # compile game
 echo "\n---COMPILING GAME---\n"
 cd build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build .
 
 if [ "$1" = 'run' ]; then
