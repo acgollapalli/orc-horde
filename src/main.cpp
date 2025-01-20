@@ -1,8 +1,10 @@
 /*
 
-SDG                                                                          JJ
+SDG                                                                                               JJ
 
-                                     Orc Horde
+                                               Orc Horde
+
+									A Game Made (almost) from scratch
 */
 
 #include <iostream>

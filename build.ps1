@@ -19,8 +19,12 @@ cd build
 cmake.exe -DCMAKE_BUILD_TYPE=Debug ..
 cmake.exe --build .
 
+# TODO(caleb): make CMake copy the shaders folder to the build target folder
+
+cp -r -Force shaders Debug/
+
 if ($args[0] -eq "run") {
-	./orc_horde.exe
+	c:\raddbg\raddbg.exe .\Debug\orc_horde.exe
 }
 
 cd ..
