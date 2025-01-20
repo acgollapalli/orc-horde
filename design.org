@@ -1,0 +1,12 @@
+#+TITLE: Orc Horde Design Doc
+#+AUTHOR: Caleb Gollapalli
+
+* Summary:
+A Mini-Rogue-Like in which you go fight the orcs, one mission at a time.
+Every mission pushes the orcs a little further back, but after you level up, the orcs come back to fight against you harder than ever.
+The longer you go without a mission in real time, the more the orc's will overrun you.
+If you clear the area completely, you get a few days of peace, but then, the orcs will come back with a vengeance, and they never stop.
+
+* Gameplay loop:
+Missions of 5 minutes max. Should be no longer than a game of overwatch or marvel rivals.
+As you the player get better, you get flashier bigger badder guns and melee weapons.
