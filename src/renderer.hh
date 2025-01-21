@@ -33,6 +33,7 @@ const uint32_t INIT_WIN_H = 600;
 const std::string TEXTURE_PATH = "./models/viking_room/viking_room.png";
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
+const int MAX_GAME_OBJECTS = 4096;
 
 class Asset; // defined in asset.hh
 typedef std::string GUID;
@@ -52,6 +53,7 @@ struct RenderOp {
   uint32_t numIndices;
   VkBuffer instanceBuffer;
   uint32_t numInstances;
+  uint32_t instanceOffset;
 };
 
 struct Renderable {
@@ -59,10 +61,6 @@ struct Renderable {
   VkBuffer 					indexBuffer;  // do not deallocate
   uint32_t 					numIndices;
   std::vector<Instance> 	instances;
-
-  // deallocate these
-  VkBuffer 				instanceBuffer;
-  VkDeviceMemory 		instanceMemory;
 };
 
 struct RenderState {
@@ -195,6 +193,18 @@ struct SwapChainSupportDetails {
   std::vector<VkPresentModeKHR> presentModes;
 };
 
+struct BufferSlice {
+  uint32_t offset;
+  VkBuffer buffer;
+};
+
+struct BufferAllocation {
+  uint32_t offset;
+  VkBuffer buffer;
+  VkDeviceMemory memory;
+};
+  
+
 class Renderer {
 public:
   /* lifetime procedures */
@@ -210,8 +220,9 @@ public:
 						  VkBuffer &vertexBuffer, VkDeviceMemory &vertexBufferMemory);
   void createIndexBuffer(std::vector<Index> indices,
 						 VkBuffer &indexBuffer, VkDeviceMemory &indexBufferMemory);
-  void createInstanceBuffer(std::vector<Instance> instances,
-							VkBuffer &instanceBuffer, VkDeviceMemory &instanceBufferMemory);
+  BufferSlice writeInstanceBuffer(std::vector<Instance> instances);
+  // TODO(caleb): handle case where instancebuffer is too small.
+  // TODO(caleb): adjust to account for double and triple buffering.
   void drawFrame(std::vector<RenderOp> renderOps);
   void destroyBuffer(VkBuffer buffer);
   void freeMemory(VkDeviceMemory memory);
@@ -268,6 +279,7 @@ private:
   VkImage colorImage;
   VkDeviceMemory colorImageMemory;
   VkImageView colorImageView;
+  std::array<BufferAllocation, MAX_FRAMES_IN_FLIGHT> instanceBufferPool;
   
   /* initialization functions */
   void createInstance();
@@ -293,6 +305,7 @@ private:
   void createDescriptorSets();
   void createCommandBuffers();
   void createSyncObjects();
+  void createInstanceBuffers();
   void initVulkan();
   
   /* handling things like resizes */
@@ -318,7 +331,7 @@ private:
   void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, std::vector<RenderOp> renderOps);
   uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
   void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
-  void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+  void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size, uint32_t dstOffset = 0);
   void updateUniformBuffer(uint32_t currentImage);
   void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling , VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
   VkCommandBuffer beginSingleTimeCommands();

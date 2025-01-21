@@ -60,8 +60,6 @@ void drawDemoFrame(Renderer &renderer, GameState gameState, int generation) {
 
   auto ops = renderState.getRenderOps(renderer);
   renderer.drawFrame(ops);
-
-  renderState.cleanup(renderer);
 }
 
 

@@ -79,28 +79,20 @@ std::vector<RenderOp> RenderState::getRenderOps(Renderer &renderer) {
   std::vector<RenderOp> renderOps;
 
   for (auto& [asset, renderable] : assets) {
-	renderer.createInstanceBuffer(renderable.instances,
-								  renderable.instanceBuffer,
-								  renderable.instanceMemory);
+	auto slice = renderer.writeInstanceBuffer(renderable.instances);
 	RenderOp op {
 	  .type = DrawMeshInstanced,
 	  .vertexBuffer = renderable.vertexBuffer,
 	  .indexBuffer = renderable.indexBuffer,
 	  .numIndices = renderable.numIndices,
-	  .instanceBuffer = renderable.instanceBuffer,
+	  .instanceBuffer = slice.buffer,
 	  .numInstances = static_cast<uint32_t>(renderable.instances.size()),
+	  .instanceOffset = slice.offset,
 	};
 	renderOps.push_back(op);
   }
   assert(renderOps[0].type == DrawMeshInstanced);
   return renderOps;
-}
-
-void RenderState::cleanup(Renderer &renderer) {
-  for (const auto& [asset, renderable] : assets) {
-	renderer.destroyBuffer(renderable.instanceBuffer);
-	renderer.freeMemory(renderable.instanceMemory);
-  }
 }
 
 /* --- Vulkan Renderer Class Begins Here --- */
@@ -144,6 +136,7 @@ void Renderer::initVulkan() {
   createDescriptorSets();
   createCommandBuffers();
   createSyncObjects();
+  createInstanceBuffers();
 }
 
 void Renderer::getInput() {
@@ -1270,8 +1263,7 @@ void Renderer::createIndexBuffer(std::vector<uint32_t> indices,
   vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void Renderer::createInstanceBuffer(std::vector<Instance> instances,
-									VkBuffer &instanceBuffer, VkDeviceMemory &instanceBufferMemory) {
+BufferSlice Renderer::writeInstanceBuffer(std::vector<Instance> instances) {
   VkDeviceSize bufferSize = sizeof(instances[0]) * instances.size();
   VkBuffer stagingBuffer;
   VkDeviceMemory stagingBufferMemory;
@@ -1290,13 +1282,23 @@ void Renderer::createInstanceBuffer(std::vector<Instance> instances,
   // TODO(caleb): we may also want to consider adding some kind of synchronization here
   // so that the vertex buffer isn't read until the copy buffer is finished, but this may
   // be a complete non-issue
-  createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			   instanceBuffer, instanceBufferMemory);
-  copyBuffer(stagingBuffer, instanceBuffer, bufferSize);
+  VkBuffer instanceBuffer = instanceBufferPool[currentFrame].buffer;
+  uint32_t &currentOffset = instanceBufferPool[currentFrame].offset;
+
+  copyBuffer(stagingBuffer, instanceBuffer, bufferSize, currentOffset);
+
+  BufferSlice slice {
+	.offset = currentOffset,
+	.buffer = instanceBuffer
+  };
   
   vkDestroyBuffer(device, stagingBuffer, nullptr);
   vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+  currentOffset += bufferSize; // TODO(caleb): Handle case where we can overflow this
+  assert(currentOffset <= (MAX_GAME_OBJECTS * sizeof(Instance)));
+
+  return slice;
 }
 
 void Renderer::createDescriptorPool() {
@@ -1404,6 +1406,17 @@ void Renderer::createSyncObjects() {
   }
 }
 
+void Renderer::createInstanceBuffers() {
+  VkDeviceSize bufferSize = MAX_GAME_OBJECTS * sizeof(instance);
+  for (auto& instanceAlloc : instanceBufferPool) {
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+				 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				 instanceAlloc.buffer, instanceAlloc.memory);
+	instanceAlloc.offset = 0;
+  }
+}
+  
+
 VkCommandBuffer Renderer::beginSingleTimeCommands(){
   VkCommandBufferAllocateInfo allocInfo {};
   allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -1437,12 +1450,12 @@ void Renderer::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
   vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
 
-void Renderer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+void Renderer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size, uint32_t dstOffset) {
   VkCommandBuffer commandBuffer = beginSingleTimeCommands();
   
   VkBufferCopy copyRegion{};
   copyRegion.srcOffset = 0;
-  copyRegion.dstOffset = 0;
+  copyRegion.dstOffset = dstOffset;
   copyRegion.size = size;
   
   vkCmdCopyBuffer(commandBuffer,srcBuffer, dstBuffer, 1, &copyRegion);
@@ -1616,7 +1629,8 @@ void Renderer::drawFrame(std::vector<RenderOp> renderOps) {
     framebufferResized = false;
     recreateSwapChain();
   }
-  
+
+  instanceBufferPool[currentFrame].offset = 0;
   currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
@@ -1675,6 +1689,9 @@ void Renderer::cleanup() {
   for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 	vkDestroyBuffer(device, uniformBuffers[i], nullptr);
 	vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
+
+	vkDestroyBuffer(device, instanceBufferPool[i].buffer, nullptr);
+	vkFreeMemory(device, instanceBufferPool[i].memory, nullptr);
   }
   
   vkDestroyDescriptorPool(device, descriptorPool, nullptr);
