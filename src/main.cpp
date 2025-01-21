@@ -29,7 +29,7 @@ GameState initGameState(Renderer &renderer) {;
   auto scale = 1.0f;
   RigidBody house = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
 
-  auto position2 = skyVec3{1.0,1.0,1.0};
+  auto position2 = skyVec3{0.5,0.5,0.5};
   auto rotation2 = skyVec3{0.0,0.0,0.0};
   auto scale2 = 2.0f;
 
@@ -55,6 +55,7 @@ void drawDemoFrame(Renderer &renderer, GameState gameState, int generation) {
   for (auto& obj : gameState.gameObjects) {
 	//obj.update();
 	obj.display(renderState);
+	gameState.gameObjects[1].move();
   }
 
   auto ops = renderState.getRenderOps(renderer);

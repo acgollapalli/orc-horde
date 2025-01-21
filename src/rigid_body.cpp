@@ -30,7 +30,9 @@ void RigidBody::display(RenderState &renderState){
   };
   return mesh->display(renderState, thisInstance);
 }
-void RigidBody::move(){}
+void RigidBody::move(){
+  position += 0.01;
+}
 bool RigidBody::load() {
   bool textureLoaded, meshLoaded;
   if (texture != nullptr) {

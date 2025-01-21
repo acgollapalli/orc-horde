@@ -331,6 +331,14 @@ private:
   bool hasStencilComponent(VkFormat format);
   void generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
   VkSampleCountFlagBits getMaxUsableSampleCount();
+void Renderer::createGraphicsPipeline(const std::string &vertShader,
+									  const std::string &fragShader,
+									  const std::vector<VkVertexInputBindingDescription> bindingDescriptions,
+									  const std::vector<VkVertexInputAttributeDescription> attributeDescriptions,
+									  
+									  VkPipelineLayout &pipelineLayout,
+									  VkPipeline &graphicsPipeline);
+
 };
 
 const std::vector<const char *> validationLayers = {

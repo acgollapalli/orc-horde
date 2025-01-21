@@ -540,7 +540,7 @@ void Renderer::createRenderPass() {
   dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
   dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
   
-  std::array<VkAttachmentDescription, 3> attachments = {colorAttachment, colorAttachmentResolve, depthAttachment};
+  std::array<VkAttachmentDescription, 3> attachments = {colorAttachment, depthAttachment, colorAttachmentResolve};
   VkRenderPassCreateInfo renderPassInfo{};
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
   renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
@@ -587,8 +587,50 @@ void Renderer:: createDescriptorSetLayout() {
 }
 
 void Renderer::createGraphicsPipeline() {
-  auto vertShaderByteCode = readBinAsset("shaders/triangle_vert.spv");
-  auto fragShaderByteCode = readBinAsset("shaders/triangle_frag.spv");
+
+  std::vector<VkVertexInputBindingDescription> simpleBinding{
+	Vertex::getBindingDescription(),
+	//Instance::getBindingDescription()
+  };
+
+  std::vector<VkVertexInputAttributeDescription> simpleAttribute;
+  for (const auto& description : Vertex::getAttributeDescriptions()) {
+	simpleAttribute.push_back(description);
+  }
+
+  createGraphicsPipeline("shaders/triangle_vert.spv", "shaders/triangle_frag.spv",
+						 simpleBinding, simpleAttribute,
+						 pipelineLayout, graphicsPipeline);
+
+  std::vector<VkVertexInputBindingDescription> instanceBinding {
+	Vertex::getBindingDescription(),
+	Instance::getBindingDescription()
+  };
+
+  std::vector<VkVertexInputAttributeDescription> instanceAttribute;
+  for (const auto& description : Vertex::getAttributeDescriptions()) {
+	instanceAttribute.push_back(description);
+  }
+  for (const auto& description : Instance::getAttributeDescriptions()) {
+  	instanceAttribute.push_back(description);
+  }
+
+  assert(instanceAttribute.size() == (Vertex::getAttributeDescriptions().size() + Instance::getAttributeDescriptions().size()));
+
+  createGraphicsPipeline("shaders/base_vert.spv", "shaders/base_frag.spv",
+						 instanceBinding, instanceAttribute,
+						 instancedPipelineLayout, instancedGraphicsPipeline);
+}
+
+void Renderer::createGraphicsPipeline(const std::string &vertShader,
+									  const std::string &fragShader,
+									  const std::vector<VkVertexInputBindingDescription> bindingDescriptions,
+									  const std::vector<VkVertexInputAttributeDescription> attributeDescriptions,
+									  
+									  VkPipelineLayout &pipelineLayout,
+									  VkPipeline &graphicsPipeline) {
+  auto vertShaderByteCode = readBinAsset(vertShader);
+  auto fragShaderByteCode = readBinAsset(fragShader);
   
   VkShaderModule vertShaderModule = createShaderModule(vertShaderByteCode);
   VkShaderModule fragShaderModule = createShaderModule(fragShaderByteCode);
@@ -617,18 +659,7 @@ void Renderer::createGraphicsPipeline() {
   dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
   dynamicState.pDynamicStates = dynamicStates.data();
   
-  std::vector<VkVertexInputBindingDescription> bindingDescriptions {
-	Vertex::getBindingDescription(),
-	//Instance::getBindingDescription()
-  };
 
-  std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-  for (const auto& description : Vertex::getAttributeDescriptions()) {
-	attributeDescriptions.push_back(description);
-  }
-  //for (const auto& description : Instance::getAttributeDescriptions()) {
-  //	attributeDescriptions.push_back(description);
-  //}
   
   VkPipelineVertexInputStateCreateInfo vertexInputInfo{
 	.sType = 							VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -887,7 +918,6 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
   // TODO(caleb): allow shader objects or pipelines specified from the op here
   // we could replace this with a dynamic call to any number of shader objects
   // see: https://www.khronos.org/blog/you-can-use-vulkan-without-pipelines-today
-  vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
   
   // need to set these because we're using a dynamic viewport
   VkViewport viewport{
@@ -898,13 +928,11 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	.minDepth = 	0.0f,
 	.maxDepth = 	1.0f,
   };
-  vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
   
   VkRect2D scissor{
 	.offset = 		{0, 0},
 	.extent = 		swapChainExtent,
   };
-  vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
   
   for (const auto& op : renderOps) {
 	
@@ -912,6 +940,11 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	switch (op.type) {
 	case DrawMeshSimple: {
 	  std::printf("\n\n\nDRAWING SIMPLE MESH\n\n\n");
+	  vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+	  vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+	  vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
 	  VkBuffer vertexBuffers[] = {op.vertexBuffer};
 	  VkDeviceSize offsets[] = {0};
 	  vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -924,7 +957,12 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	  
 	  vkCmdDrawIndexed(commandBuffer, op.numIndices, 1, 0, 0, 0);
 	} break;
-	case DrawMeshInstanced: {	// 
+	case DrawMeshInstanced: {	//
+	  vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, instancedGraphicsPipeline);
+
+	  vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+	  vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
 	  VkBuffer vertexBuffers[] = {op.vertexBuffer, op.instanceBuffer};
 	  VkDeviceSize offsets[] = {0, 0};
 	  vkCmdBindVertexBuffers(commandBuffer, 0, 2, vertexBuffers, offsets);
@@ -1111,7 +1149,7 @@ void Renderer::generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texW
 	blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	blit.srcSubresource.mipLevel = i - 1;
 	blit.srcSubresource.baseArrayLayer = 0;
-	blit.srcSubresource.layerCount = 0;
+	blit.srcSubresource.layerCount = 1;
 	blit.dstOffsets[0] = { 0, 0, 0 };
 	blit.dstOffsets[1] = { mipWidth > 1 ? mipWidth / 2 : 1, mipHeight > 1 ? mipHeight / 2 : 1, 1 };
 	blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -1142,7 +1180,7 @@ void Renderer::generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texW
   
   barrier.subresourceRange.baseMipLevel = mipLevels -1;
   barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-  barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+  barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
   barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
   barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
   
@@ -1441,14 +1479,24 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
   float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
   
   UniformBufferObject ubo{};
-  ubo.view = glm::lookAt(glm::vec3(2.0f + time, 2.0f + time, 2.0f + time),
-						 glm::vec3(0.0f, 0.0f, 0.0f),
-						 glm::vec3(0.0f, 0.0f, 1.0f));
-  
+  //  ubo.view = glm::lookAt(glm::vec3(2.0f + time, 2.0f + time, 2.0f + time),
+  //						 glm::vec3(0.0f, 0.0f, 0.0f),
+  //						 glm::vec3(0.0f, 0.0f, 1.0f));
+  //  
+  //  ubo.proj = glm::perspective(glm::radians(45.0f),
+  //							  swapChainExtent.width / (float) swapChainExtent.height,
+  //							  0.1f,
+  //							  100.0f);
+
+  ubo.view = glm::lookAt(glm::vec3(2.0f , 2.0f, 2.0f),
+  						 glm::vec3(0.0f, 0.0f, 0.0f),
+  						 glm::vec3(0.0f, 0.0f, 1.0f));
+    
   ubo.proj = glm::perspective(glm::radians(45.0f),
-							  swapChainExtent.width / (float) swapChainExtent.height,
-							  0.1f,
-							  100.0f);
+  							  swapChainExtent.width / (float) swapChainExtent.height,
+  							  0.1f,
+  							  100.0f);
+
   ubo.proj[1][1] *= -1;
   
   memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
@@ -1466,9 +1514,9 @@ void Renderer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayo
   barrier.image = image;
   barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
   barrier.subresourceRange.baseMipLevel = 0;
-  barrier.subresourceRange.levelCount = 1;
+  barrier.subresourceRange.levelCount = mipLevels;
   barrier.subresourceRange.baseArrayLayer = 0;
-  barrier.subresourceRange.layerCount = mipLevels;
+  barrier.subresourceRange.layerCount = 1;
   
   VkPipelineStageFlags sourceStage, destinationStage;
   
@@ -1635,6 +1683,10 @@ void Renderer::cleanup() {
   
   vkDestroyPipeline(device, graphicsPipeline, nullptr);
   vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+
+  vkDestroyPipeline(device, instancedGraphicsPipeline, nullptr);
+  vkDestroyPipelineLayout(device, instancedPipelineLayout, nullptr);
+
   
   vkDestroyRenderPass(device, renderPass, nullptr);
   
