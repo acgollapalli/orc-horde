@@ -36,7 +36,8 @@ GameState initGameState(Renderer &renderer) {;
   RigidBody house2 = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
 
   GameState gameState { .assetStore = *assetStore,
-						.gameObjects {house, house2},      };
+						.gameObjects {house,
+									  house2},      };
 
 
   // TODO(caleb): This should probabaly be assigned to a job queue somewhere
@@ -49,7 +50,7 @@ GameState initGameState(Renderer &renderer) {;
 
 } 
 
-void drawDemoFrame(Renderer &renderer, GameState gameState, int generation) {
+void drawDemoFrame(Renderer &renderer, GameState &gameState, int generation) {
   RenderState renderState = {};
 
   for (auto& obj : gameState.gameObjects) {
