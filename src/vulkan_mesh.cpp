@@ -79,12 +79,12 @@ void Mesh::unload() {
 void	Mesh::load(LOD lod) {}
 void	Mesh::unload(LOD lod){}
 
-RenderOp Mesh::display () {
-  return RenderOp {
-	.type = DrawMeshSimple,
-	.vertexBuffer = vertices_st.buffer,
-	.indexBuffer = indices_st.buffer,
-	.numIndices = indices_st.size,
-	.instanceBuffer = {},
-  };
+void Mesh::display (RenderState &renderState, const Instance &thisInstance) {
+  Renderable &renderable = renderState.assets[guid];
+  if (renderable.numIndices == 0) {
+	renderable.vertexBuffer = vertices_st.buffer;
+	renderable.indexBuffer = indices_st.buffer;
+	renderable.numIndices = indices_st.size;
+  }
+  renderable.instances.push_back(thisInstance);
 }

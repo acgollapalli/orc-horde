@@ -7,6 +7,8 @@ SDG                                                                             
 									 Game Object
 */
 
+#pragma once
+
 #include <glm/glm.hpp> // TODO(caleb): get rid of GLM
 
 #include "asset.hh"
@@ -22,10 +24,10 @@ public:
   GameObject(skyVec3 position) :position(position){};
   //~GameObject();
 
-  virtual void update() = 0;
-  virtual RenderOp display() = 0;
-  virtual void move() = 0;
-private:
+  virtual void 			update() = 0;
+  virtual void 			display(RenderState &renderState) = 0;
+  virtual void 			move() = 0;
+protected:
   skyVec3 position;
 };
 
@@ -34,16 +36,16 @@ public:
   RigidBody(skyVec3 position, skyVec3 rotation, float scale,
 			GUID textureId, GUID meshId, AssetStore &assetStore);
   //~RigidBody();
-  void update();
-  RenderOp display();
-  void move();
-  bool load();
+  void 					update();
+  void 					display(RenderState &renderState);
+  void 					move();
+  bool 					load();
 private:
   // TODO(caleb): add private copy constructor
-  skyVec3 rotation;
-  float scale;
-  Mesh *mesh;
-  Texture *texture;
+  skyVec3 				rotation;
+  float 				scale;
+  Mesh *				mesh;
+  Texture *				texture;
 };
 
 class Decorator : public GameObject {

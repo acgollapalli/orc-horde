@@ -9,7 +9,7 @@ SDG                                                                             
 
 #include "asset.hh"
 
-const AssetLocation MODEL_PATH = "../models/viking_room/viking_room.obj";
+const AssetLocation MODEL_PATH = "./models/viking_room/viking_room.obj";
 const GUID MODEL_GUID = "viking_room1234";
 
 AssetStore::AssetStore(Renderer &renderer)
@@ -50,7 +50,7 @@ Asset *AssetStore::get(GUID guid) {
   }
 }
 
-Texture *AssetStore::get_texture(GUID guid) {
+Texture *AssetStore::getTexture(GUID guid) {
   AssetInfo info;
   try {
 	info = assetDb.at(guid);
@@ -67,7 +67,7 @@ Texture *AssetStore::get_texture(GUID guid) {
   }
 }
 
-Mesh *AssetStore::get_mesh(GUID guid) {
+Mesh *AssetStore::getMesh(GUID guid) {
   AssetInfo info;
   try {
 	info = assetDb.at(guid);

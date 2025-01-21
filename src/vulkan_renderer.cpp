@@ -73,6 +73,36 @@ bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
   return requiredExtensions.empty();
 }
 
+/* =================================== Render State =================================== */
+
+std::vector<RenderOp> RenderState::getRenderOps(Renderer &renderer) {
+  std::vector<RenderOp> renderOps;
+
+  for (auto& [asset, renderable] : assets) {
+	renderer.createInstanceBuffer(renderable.instances,
+								  renderable.instanceBuffer,
+								  renderable.instanceMemory);
+	RenderOp op {
+	  .type = DrawMeshInstanced,
+	  .vertexBuffer = renderable.vertexBuffer,
+	  .indexBuffer = renderable.indexBuffer,
+	  .numIndices = renderable.numIndices,
+	  .instanceBuffer = renderable.instanceBuffer,
+	  .numInstances = static_cast<uint32_t>(renderable.instances.size()),
+	};
+	renderOps.push_back(op);
+  }
+  assert(renderOps[0].type == DrawMeshInstanced);
+  return renderOps;
+}
+
+void RenderState::cleanup(Renderer &renderer) {
+  for (const auto& [asset, renderable] : assets) {
+	renderer.destroyBuffer(renderable.instanceBuffer);
+	renderer.freeMemory(renderable.instanceMemory);
+  }
+}
+
 /* --- Vulkan Renderer Class Begins Here --- */
 
 void Renderer::initWindow() {
@@ -905,7 +935,7 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 							  pipelineLayout, 0, 1,
 							  &descriptorSets[currentFrame], 0, nullptr);
 	  
-	  vkCmdDrawIndexed(commandBuffer, op.numIndices, 1, 0, 0, 0);
+	  vkCmdDrawIndexed(commandBuffer, op.numIndices, op.numInstances, 0, 0, 0);
 	} break;
 	}
   }

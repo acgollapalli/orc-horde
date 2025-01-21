@@ -13,6 +13,8 @@ SDG                                                                             
 #include <vector>
 #include "vendor/tiny_obj_loader.h"
 
+#include "containers.hh"
+
 #include "renderer.hh" // TODO: Move vertex code to separate file
 
 // TODO: IFDEF THIS:
@@ -67,12 +69,12 @@ public:
   AssetStore(Renderer &renderer);
   void  		    		load(GUID guid);
   Asset * 					get(GUID guid);
-  Texture *					get_texture(GUID guid); // TODO(caleb): fix this (odin casing instead of C++)
-  Mesh *					get_mesh(GUID guid);
+  Texture *					getTexture(GUID guid); // TODO(caleb): fix this (odin casing instead of C++)
+  Mesh *					getMesh(GUID guid);
   int 						relinquish(GUID guid); // returns number of other claims on asset
   void						unload(GUID guid);
-  void						force_unload(GUID guid);
-  AssetLocation 			getLocation(GUID guid); // SUBJECT TO CHANGEs
+  void						forceUnload(GUID guid);
+  AssetLocation 			getLocation(GUID guid); // SUBJECT TO CHANGES
 
 private:
   AssetDB			        assetDb;
@@ -92,6 +94,7 @@ public:
   GUID 					guid;
   virtual bool 			load() = 0;   // TODO: maybe this doesn't need to be virtual
   virtual void			unload() = 0; // TODO: maybe this doesn't have to be virtual either
+  int					generation = 0; 
   friend class AssetStore;
 protected:
   bool 					loaded;
@@ -132,7 +135,7 @@ public:
   void						load(LOD lod);
   void						unload();
   void						unload(LOD lod);
-  RenderOp					display();
+  void 						display(RenderState &renderState, const Instance &thisInstance);
   friend class AssetStore;
   
 private:

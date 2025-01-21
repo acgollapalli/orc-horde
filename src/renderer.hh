@@ -13,6 +13,7 @@ SDG                                                                          JJ
 #include <fstream>
 #include <optional>
 #include <vector>
+#include <map>
 
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
@@ -29,11 +30,15 @@ const uint32_t INIT_WIN_H = 600;
 //const std::string MODEL_PATH = "../models/maneki_neko/source/neko.obj";
 //const std::string TEXTURE_PATH = "../models/maneki_neko/textures/neko.png";
 
-const std::string TEXTURE_PATH = "../models/viking_room/viking_room.png";
+const std::string TEXTURE_PATH = "./models/viking_room/viking_room.png";
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 class Asset; // defined in asset.hh
+typedef std::string GUID;
+
+struct Instance;
+class Renderer;
 
 enum RenderOpType {
   DrawMeshSimple,
@@ -46,6 +51,26 @@ struct RenderOp {
   VkBuffer indexBuffer;
   uint32_t numIndices;
   VkBuffer instanceBuffer;
+  uint32_t numInstances;
+};
+
+struct Renderable {
+  VkBuffer 					vertexBuffer; // do not deallocate
+  VkBuffer 					indexBuffer;  // do not deallocate
+  uint32_t 					numIndices;
+  std::vector<Instance> 	instances;
+
+  // deallocate these
+  VkBuffer 				instanceBuffer;
+  VkDeviceMemory 		instanceMemory;
+};
+
+struct RenderState {
+  std::unordered_map<GUID, Renderable> assets;
+
+  // WARNING(caleb): This will allocate instance buffers
+  std::vector<RenderOp> getRenderOps(Renderer &renderer);
+  void cleanup(Renderer & renderer);
 };
 
 struct Vertex {

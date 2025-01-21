@@ -22,6 +22,7 @@ cmake.exe --build .
 # TODO(caleb): make CMake copy the shaders folder to the build target folder
 
 cp -r -Force shaders Debug/
+cp -r -Force ../models Debug/
 
 if ($args[0] -eq "run") {
 	c:\raddbg\raddbg.exe .\Debug\orc_horde.exe

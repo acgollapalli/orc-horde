@@ -27,8 +27,17 @@ GameState initGameState(Renderer &renderer) {;
   auto position = skyVec3{0.0,0.0,0.0};
   auto rotation = skyVec3{0.0,0.0,0.0};
   auto scale = 1.0f;
-
   RigidBody house = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
+
+  auto position2 = skyVec3{1.0,1.0,1.0};
+  auto rotation2 = skyVec3{0.0,0.0,0.0};
+  auto scale2 = 2.0f;
+
+  RigidBody house2 = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
+
+  GameState gameState { .assetStore = *assetStore,
+						.gameObjects {house, house2},      };
+
 
   // TODO(caleb): This should probabaly be assigned to a job queue somewhere
   // when we get to that point
@@ -36,20 +45,22 @@ GameState initGameState(Renderer &renderer) {;
 	std::printf("Loading house...");
   }
 
-  return GameState { .assetStore = *assetStore,
-					 .gameObjects {house},      };
+  return gameState;
 
 } 
 
-void drawDemoFrame(Renderer &renderer, GameState gameState) {
-  std::vector<RenderOp> ops;
+void drawDemoFrame(Renderer &renderer, GameState gameState, int generation) {
+  RenderState renderState = {};
 
   for (auto& obj : gameState.gameObjects) {
 	//obj.update();
-	ops.push_back(obj.display());
+	obj.display(renderState);
   }
 
+  auto ops = renderState.getRenderOps(renderer);
   renderer.drawFrame(ops);
+
+  renderState.cleanup(renderer);
 }
 
 
@@ -63,11 +74,12 @@ int main (int argc, char *argv[]) {
 	auto prev_frame = std::chrono::high_resolution_clock::now();
 	GameState gameState = initGameState(renderer);
 
+	int generation = 0;
     while (!renderer.shouldClose()) {
 	  auto current_frame = std::chrono::high_resolution_clock::now();
 	  if ((current_frame - prev_frame) > MIN_FRAME_TIME) {
 		renderer.getInput();
-		drawDemoFrame(renderer, gameState);
+		drawDemoFrame(renderer, gameState, generation++);
 		prev_frame = current_frame;
 	  }
     }
