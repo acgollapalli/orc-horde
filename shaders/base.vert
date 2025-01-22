@@ -34,7 +34,7 @@ mat4 rotationFromQuaternion(vec3 position, vec4 quat) {
 
 void main() {
   mat4 instTransform = rotationFromQuaternion(instPosition, instRotation);
-  gl_Position = ubo.proj * ubo.view * instTransform * vec4(inPosition, 1.0);
+  gl_Position = ubo.proj * ubo.view * instTransform * vec4(inPosition * instScale, 1.0);
   fragColor = inColor;
   fragTexCoord = inTexCoord;
 }

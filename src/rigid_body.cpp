@@ -33,9 +33,10 @@ void RigidBody::display(RenderState &renderState){
 
 void RigidBody::move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw) {
   float dt_micros= static_cast<float>(dt.count());
-
   position += dv * dt_micros;
-  rotation += skyQuat::fromAngle(dw, 0.0f) * rotation * (dt_micros / 2.0f);
+
+  // assume dw is an angular velocity
+  rotation += skyQuat{0.0f, dw.x, dw.y, dw.z} * rotation * (dt_micros / 2.0f);
   rotation.normalize();
 }
 

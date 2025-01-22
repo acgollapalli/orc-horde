@@ -11,9 +11,11 @@ SDG                                                                             
 #include <stdexcept>
 #include <chrono>
 
-#include "math.hh"
-
 #include "game_object.hh"
+
+#ifndef PI
+#define PI 3.14159
+#endif
 
 using namespace std::literals;
 
@@ -27,13 +29,13 @@ struct GameState {
 GameState initGameState(Renderer &renderer) {;
   AssetStore *assetStore = new AssetStore(renderer);
   skyVec3 position (0.0,0.0,0.0);
-  skyQuat rotation = skyQuat::unitVec();
-  auto scale = 1.0f;
+  skyQuat rotation = skyQuat::fromAngle(skyVec3(0.0, 1.0, 0.0), PI);
+  float scale = 1.0f;
   RigidBody house = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
 
-  auto position2 = skyVec3{0.5,0.5,0.5};
-  auto rotation2 = skyVec3{0.0,0.0,0.0};
-  auto scale2 = 2.0f;
+  skyVec3 position2 (0.5,0.5,0.5);
+  skyQuat rotation2 = skyQuat::fromAngle(skyVec3(0.0, 1.0, 0.0), PI);
+  float scale2 = 1.0f;
 
   RigidBody house2 = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
 
@@ -58,9 +60,14 @@ void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::durati
   for (auto& obj : gameState.gameObjects) {
 	//obj.update();
 	obj.display(renderState);
+	gameState.gameObjects[0].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
+								  //skyVec3(0.0, 0.000001, 0.0),
+								  skyVec3(0.0, 0.0, 0.0),
+								  skyVec3(0.0, 0.000001, 0.0 ));
+
 	gameState.gameObjects[1].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
-								  skyVec3(0.0, 0.001, 0.0),
-								  skyVec3(0.0, 0.000, 0.001));
+								  skyVec3(0.0, 0.000001, 0.0),
+								  skyVec3(0.0, 0.0, 0.000001));
   }
 
   auto ops = renderState.getRenderOps(renderer);

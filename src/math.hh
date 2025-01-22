@@ -11,6 +11,7 @@ SDG                                                                             
 
 #include <glm/glm.hpp> // TODO(caleb): get rid of GLM
 #include <cmath>
+#include <numbers>
 
 typedef glm::vec2 skyVec2; //  FIXME(caleb): you're a trained mathematician. WRITE YOUR OWN MATH
 typedef glm::vec3 skyVec3; // TODO(caleb): seriously, write your own math library
@@ -88,10 +89,12 @@ struct skyQuat {
   }
 
   static const skyQuat fromAngle(skyVec3 v, float theta) {
-	return skyQuat { .w = std::cos(theta / 2),
-					 .x = std::sin(theta / 2),
-					 .y = std::sin(theta / 2),
-					 .z = std::sin(theta / 2), };
+	auto s = skyQuat { .w = std::cos(theta / 2),
+					   .x = std::sin(theta / 2),
+					   .y = std::sin(theta / 2),
+					   .z = std::sin(theta / 2), };
+	s.normalize();
+	return s;
   }
 
   explicit operator skyVec4() const { return skyVec4(w, x, y, z); }

@@ -697,7 +697,7 @@ void Renderer::createGraphicsPipeline(const std::string &vertShader,
   rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
   rasterizer.lineWidth = 1.0f;
   rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-  rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+  rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
   rasterizer.depthBiasEnable = VK_FALSE;
   rasterizer.depthBiasConstantFactor = 0.0f;
   rasterizer.depthBiasClamp = 0.0f;
@@ -1510,7 +1510,7 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
   							  0.1f,
   							  100.0f);
 
-  ubo.proj[1][1] *= -1;
+  //ubo.proj[1][1] *= -1;
   
   memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
