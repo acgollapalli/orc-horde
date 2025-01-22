@@ -129,7 +129,7 @@ typedef uint32_t Index;
 
 struct Instance {
   glm::vec3 position;
-  glm::vec3 rotation;
+  glm::vec4 rotation;
   float			scale;
   uint32_t		textureIndex;
   
@@ -152,7 +152,7 @@ struct Instance {
   	  VkVertexInputAttributeDescription {  // rotation
   	    .location = 4,
 		.binding = 1,
-  	    .format = VK_FORMAT_R32G32B32_SFLOAT,
+  	    .format = VK_FORMAT_R32G32B32A32_SFLOAT,
   	    .offset = offsetof(Instance, rotation) },
 	  
   	  VkVertexInputAttributeDescription {  // scale

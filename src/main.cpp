@@ -11,6 +11,8 @@ SDG                                                                             
 #include <stdexcept>
 #include <chrono>
 
+#include "math.hh"
+
 #include "game_object.hh"
 
 using namespace std::literals;
@@ -24,8 +26,8 @@ struct GameState {
 
 GameState initGameState(Renderer &renderer) {;
   AssetStore *assetStore = new AssetStore(renderer);
-  auto position = skyVec3{0.0,0.0,0.0};
-  auto rotation = skyVec3{0.0,0.0,0.0};
+  skyVec3 position (0.0,0.0,0.0);
+  skyQuat rotation = skyQuat::unitVec();
   auto scale = 1.0f;
   RigidBody house = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
 
@@ -50,13 +52,15 @@ GameState initGameState(Renderer &renderer) {;
 
 } 
 
-void drawDemoFrame(Renderer &renderer, GameState &gameState, int generation) {
+void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::duration<float> dt) {
   RenderState renderState = {};
 
   for (auto& obj : gameState.gameObjects) {
 	//obj.update();
 	obj.display(renderState);
-	gameState.gameObjects[1].move();
+	gameState.gameObjects[1].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
+								  skyVec3(0.0, 0.001, 0.0),
+								  skyVec3(0.0, 0.000, 0.001));
   }
 
   auto ops = renderState.getRenderOps(renderer);
@@ -79,7 +83,7 @@ int main (int argc, char *argv[]) {
 	  auto current_frame = std::chrono::high_resolution_clock::now();
 	  if ((current_frame - prev_frame) > MIN_FRAME_TIME) {
 		renderer.getInput();
-		drawDemoFrame(renderer, gameState, generation++);
+		drawDemoFrame(renderer, gameState, current_frame - prev_frame);
 		prev_frame = current_frame;
 	  }
     }

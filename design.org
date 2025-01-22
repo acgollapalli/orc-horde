@@ -10,3 +10,19 @@ If you clear the area completely, you get a few days of peace, but then, the orc
 * Gameplay loop:
 Missions of 5 minutes max. Should be no longer than a game of overwatch or marvel rivals.
 As you the player get better, you get flashier bigger badder guns and melee weapons.
+
+* Tasks:
+** DONE Hello Triangle
+** DONE Loading Meshes into AssetDB
+** DONE Instanced Rendering of Meshes
+** TODO Rotation
+
+** TODO World Space to Screen Space Coordinates.
+** TODO Input
+** TODO Tiles
+** TODO Player Interface
+** TODO Core Game Loop
+** TODO Switch to SDL
+** TODO WebGPU Backend
+** HOLD Music
+** TODO Loading Textures into AssetDB

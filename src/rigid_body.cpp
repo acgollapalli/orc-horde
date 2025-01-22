@@ -9,7 +9,7 @@ SDG                                                                             
 
 #include "game_object.hh"
 
-RigidBody::RigidBody(skyVec3 position, skyVec3 rotation, float scale,
+RigidBody::RigidBody(skyVec3 position, skyQuat rotation, float scale,
 					 GUID textureId, GUID meshId, AssetStore &assetStore)
   : GameObject(position)
   , rotation(rotation)
@@ -25,14 +25,20 @@ void RigidBody::update(){}
 void RigidBody::display(RenderState &renderState){
   Instance thisInstance {
 	.position = position,
-	.rotation = rotation,
+	.rotation = static_cast<skyVec4>(rotation),
 	.scale = scale,
   };
   return mesh->display(renderState, thisInstance);
 }
-void RigidBody::move(){
-  position.y += 0.0001f;
+
+void RigidBody::move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw) {
+  float dt_micros= static_cast<float>(dt.count());
+
+  position += dv * dt_micros;
+  rotation += skyQuat::fromAngle(dw, 0.0f) * rotation * (dt_micros / 2.0f);
+  rotation.normalize();
 }
+
 bool RigidBody::load() {
   bool textureLoaded, meshLoaded;
   if (texture != nullptr) {

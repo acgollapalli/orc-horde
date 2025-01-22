@@ -9,12 +9,10 @@ SDG                                                                             
 
 #pragma once
 
-#include <glm/glm.hpp> // TODO(caleb): get rid of GLM
+#include "math.hh"
+#include <chrono>
 
 #include "asset.hh"
-
-typedef glm::vec2 skyVec2; //  FIXME(caleb): you're a trained mathematician. WRITE YOUR OWN MATH
-typedef glm::vec3 skyVec3; // TODO(caleb): seriously, write your own math library
 
 typedef skyVec3 Location;
 typedef skyVec2 DecoratorSize;
@@ -26,23 +24,22 @@ public:
 
   virtual void 			update() = 0;
   virtual void 			display(RenderState &renderState) = 0;
-  virtual void 			move() = 0;
 protected:
   skyVec3 position;
 };
 
 class RigidBody : public GameObject {
 public:
-  RigidBody(skyVec3 position, skyVec3 rotation, float scale,
+  RigidBody(skyVec3 position, skyQuat rotation, float scale,
 			GUID textureId, GUID meshId, AssetStore &assetStore);
   //~RigidBody();
   void 					update();
   void 					display(RenderState &renderState);
-  void 					move();
+  void                  move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw);
   bool 					load();
 private:
   // TODO(caleb): add private copy constructor
-  skyVec3 				rotation;
+  skyQuat               rotation;
   float 				scale;
   Mesh *				mesh;
   Texture *				texture;
