@@ -81,7 +81,7 @@ void	Mesh::unload(LOD lod){}
 
 void Mesh::display (RenderState &renderState, const Instance &thisInstance) {
   Renderable &renderable = renderState.assets[guid];
-  if (renderable.numIndices == 0) {
+  if (renderable.numIndices != indices_st.size) {
 	renderable.vertexBuffer = vertices_st.buffer;
 	renderable.indexBuffer = indices_st.buffer;
 	renderable.numIndices = indices_st.size;

@@ -92,6 +92,7 @@ std::vector<RenderOp> RenderState::getRenderOps(Renderer &renderer) {
 	renderOps.push_back(op);
   }
   assert(renderOps[0].type == DrawMeshInstanced);
+  //std::printf("renderOps0 %d, %d vs renderOps1 %d, %d", op0.numInstances, op0.instanceOffset, op1.numInstances, op1.instanceOffset);
   return renderOps;
 }
 
@@ -957,7 +958,7 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	  vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 	  VkBuffer vertexBuffers[] = {op.vertexBuffer, op.instanceBuffer};
-	  VkDeviceSize offsets[] = {0, 0};
+	  VkDeviceSize offsets[] = {0, op.instanceOffset};
 	  vkCmdBindVertexBuffers(commandBuffer, 0, 2, vertexBuffers, offsets);
 	  
 	  vkCmdBindIndexBuffer(commandBuffer, op.indexBuffer, 0, VK_INDEX_TYPE_UINT32);
@@ -1294,6 +1295,8 @@ BufferSlice Renderer::writeInstanceBuffer(std::vector<Instance> instances) {
   
   vkDestroyBuffer(device, stagingBuffer, nullptr);
   vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+  std::printf("Writing buffer at offset %d, with size: %d and first position %f, %f, %fi\n", currentOffset, instances.size(), instances[0].position.x, instances[0].position.y, instances[0].position.z);
 
   currentOffset += bufferSize; // TODO(caleb): Handle case where we can overflow this
   assert(currentOffset <= (MAX_GAME_OBJECTS * sizeof(Instance)));

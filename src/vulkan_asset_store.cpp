@@ -12,17 +12,31 @@ SDG                                                                             
 const AssetLocation MODEL_PATH = "./models/viking_room/viking_room.obj";
 const GUID MODEL_GUID = "viking_room1234";
 
+const AssetLocation ORC_PATH = "./models/orc_low_poly/orc_low_poly.obj";
+const GUID ORC_GUID= "orc_low_poly";
+
 AssetStore::AssetStore(Renderer &renderer)
   :renderer(renderer)
 {
-  AssetInfo assetInfo {
+  AssetInfo houseInfo {
 	.type = Mesh_e,
 	.locationType = File_e,
 	.assetSize = 0,
 	.assetLocation = MODEL_PATH,
 	.asset = nullptr
   };
-  assetDb[MODEL_GUID] = assetInfo;
+  assetDb[MODEL_GUID] = houseInfo;
+
+
+  AssetInfo orcInfo {
+	.type = Mesh_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = ORC_PATH,
+	.asset = nullptr
+  };
+  assetDb[ORC_GUID] = orcInfo;
+
 }
 
 Asset *AssetStore::get(GUID guid) {

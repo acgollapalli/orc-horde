@@ -33,6 +33,8 @@ GameState initGameState(Renderer &renderer) {;
   float scale = 1.0f;
   RigidBody house = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
 
+  RigidBody orc = RigidBody(position, rotation, scale * 0.1, "", "orc_low_poly", *assetStore);
+
   skyVec3 position2 (0.5,0.5,0.5);
   skyQuat rotation2 = skyQuat::fromAngle(skyVec3(0.0, 1.0, 0.0), PI);
   float scale2 = 1.0f;
@@ -41,13 +43,18 @@ GameState initGameState(Renderer &renderer) {;
 
   GameState gameState { .assetStore = *assetStore,
 						.gameObjects {house,
-									  house2},      };
+									  orc,
+									  house2},};
 
 
   // TODO(caleb): This should probabaly be assigned to a job queue somewhere
   // when we get to that point
-  while (!house.load()) {
-	std::printf("Loading house...");
+  bool loadingAssets= true;
+  while (loadingAssets) {
+	loadingAssets = false;
+	for (auto& obj : gameState.gameObjects) {
+	  if (!obj.load()) loadingAssets = true;
+	}
   }
 
   return gameState;
@@ -60,13 +67,17 @@ void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::durati
   for (auto& obj : gameState.gameObjects) {
 	//obj.update();
 	obj.display(renderState);
+	//gameState.gameObjects[0].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
+	//							  //skyVec3(0.0, 0.000001, 0.0),
+	//							  skyVec3(0.0, 0.0, 0.0),
+	//							  skyVec3(0.0, 0.000001, 0.0 ));
+
 	gameState.gameObjects[0].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
-								  //skyVec3(0.0, 0.000001, 0.0),
-								  skyVec3(0.0, 0.0, 0.0),
-								  skyVec3(0.0, 0.000001, 0.0 ));
+								  skyVec3(0.0, 0.000001, 0.0),
+								  skyVec3(0.0, 0.0, 0.000001));
 
 	gameState.gameObjects[1].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
-								  skyVec3(0.0, 0.000001, 0.0),
+								  skyVec3(.0000001, 0.0, -0.0000001),
 								  skyVec3(0.0, 0.0, 0.000001));
   }
 
@@ -82,8 +93,9 @@ int main (int argc, char *argv[]) {
 	renderer.initWindow();
     renderer.initGraphics();
 
-	auto prev_frame = std::chrono::high_resolution_clock::now();
 	GameState gameState = initGameState(renderer);
+
+	auto prev_frame = std::chrono::high_resolution_clock::now();
 
 	int generation = 0;
     while (!renderer.shouldClose()) {
