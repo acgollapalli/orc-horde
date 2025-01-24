@@ -21,6 +21,7 @@ SDG                                                                             
 #include <unordered_map>
 #include <vector>
 
+//#define GLM_FORCE_LEFT_HANDED
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -1559,14 +1560,15 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
 
   ubo.view = glm::lookAt(glm::vec3(0.0f, 0.1f, 10.0f),
   						 glm::vec3(0.0f, 0.0f, 0.0f),
-  						 glm::vec3(0.0f, 0.0f, 1.0f));
+  						 glm::vec3(0.0f, 0.0f, -1.0f));
     
   ubo.proj = glm::perspective(glm::radians(45.0f),
   							  swapChainExtent.width / (float) swapChainExtent.height,
-  							  0.1f,
-  							  100.0f);
+							  0.1f,
+							  100.0f);
 
   ubo.proj[1][1] *= -1;
+  
   
   memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }

@@ -82,7 +82,7 @@ void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::durati
 	// orc
 	gameState.gameObjects[1].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
 								  skyVec3(0.0000005, 0.0, 0.0 ),
-								  skyVec3(0.0, 0.0, 0.0));
+								  skyVec3(0.0, 0.0, 0.0000005));
 
 	// map
 	//gameState.gameObjects[3].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),

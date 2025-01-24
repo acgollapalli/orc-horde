@@ -81,10 +81,10 @@ bool Mesh::loadFromFile() {
 bool Mesh::loadComputed() {
   const std::vector<Vertex> vertices = {
 	/*     Position                 Color           Texture (UV) */
-	{ {-0.5f, -0.5f, 0.0f},	 {1.0f, 0.0f, 0.0f}, 	{0.0f, 0.0f} },
-    { {0.5f, -0.5f, 0.0f},	 {0.0f, 1.0f, 0.0f}, 	{1.0f, 0.0f} },
-    { {0.5f, 0.5f, 0.0f}, 	 {0.0f, 0.0f, 1.0f}, 	{1.0f, 1.0f} },
-    { {-0.5f, 0.5f, 0.0f},	 {1.0f, 1.0f, 1.0f}, 	{0.0f, 1.0f} }
+	{ {-0.5f, -0.5f, 0.0f},	 {1.0f, 0.0f, 0.0f}, 	{0.0f, 1.0f} },
+    { {0.5f, -0.5f, 0.0f},	 {0.0f, 1.0f, 0.0f}, 	{1.0f, 1.0f} },
+    { {0.5f, 0.5f, 0.0f}, 	 {0.0f, 0.0f, 1.0f}, 	{1.0f, 0.0f} },
+    { {-0.5f, 0.5f, 0.0f},	 {1.0f, 1.0f, 1.0f}, 	{0.0f, 0.0f} }
   };
   
   const std::vector<Index> indices = { 0, 1, 2, 2, 3, 0 };
