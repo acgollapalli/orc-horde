@@ -19,7 +19,10 @@ As you the player get better, you get flashier bigger badder guns and melee weap
 We can rotate, but we may have messed up the handedness of our meshes somehow.
 ** BUG Game crashes on resize
 ** INPROGRESS Figure out how to get textures for different meshes
+** BUG Map texture is mirrored
+maybe an export problem?
 ** TEST World Space to Screen Space Coordinates.
+In top down view it looks like we are rotated 180 degrees around the z axis
 ** TODO Input
 ** TODO Tiles
 ** TODO Player Interface

@@ -74,14 +74,14 @@ void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::durati
 	//							  skyVec3(0.0, 0.0, 0.0),
 	//							  skyVec3(0.0, 0.000001, 0.0 ));
 
-	// orc
+	// house
 	gameState.gameObjects[0].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
-								  skyVec3(0.0, 0.000001, 0.0),
-								  skyVec3(0.0, 0.0, 0.000001));
+								  skyVec3(0.0, 0.0000005, 0.0),
+								  skyVec3(0.0, 0.0, 0.0));
 
-	// other house
+	// orc
 	gameState.gameObjects[1].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
-								  skyVec3(0.0, 0.0, 0.0000001),
+								  skyVec3(0.0000005, 0.0, 0.0 ),
 								  skyVec3(0.0, 0.0, 0.0));
 
 	// map
