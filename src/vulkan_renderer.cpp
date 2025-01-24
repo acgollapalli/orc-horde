@@ -1558,7 +1558,8 @@ void Renderer::updateUniformBuffer(uint32_t currentImage) {
   //							  0.1f,
   //							  100.0f);
 
-  ubo.view = glm::lookAt(glm::vec3(0.0f, 0.1f, 10.0f),
+  // NOTE(caleb): this is the top down view
+  ubo.view = glm::lookAt(glm::vec3(0.0f, 0.1f, 10.0f), // TODO(caleb): WRITE YOUR OWN MATH
   						 glm::vec3(0.0f, 0.0f, 0.0f),
   						 glm::vec3(0.0f, 0.0f, -1.0f));
     

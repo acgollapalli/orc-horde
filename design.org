@@ -11,6 +11,8 @@ If you clear the area completely, you get a few days of peace, but then, the orc
 Missions of 5 minutes max. Should be no longer than a game of overwatch or marvel rivals.
 As you the player get better, you get flashier bigger badder guns and melee weapons.
 
+
+
 * Tasks:
 ** DONE Hello Triangle
 ** DONE Loading Meshes into AssetDB
@@ -22,7 +24,12 @@ We can rotate, but we may have messed up the handedness of our meshes somehow.
 ** BUG Map texture is mirrored
 maybe an export problem?
 ** TEST World Space to Screen Space Coordinates.
-In top down view it looks like we are rotated 180 degrees around the z axis
+*** DONE Top down view
+Our world is approx 8 units tall and 10.8 units wide
+orcs will stream in from (x, 4) for now
+*** TODO FPS view
+May not be feasible. Will need to test. But it will have right handed coordinates.
+
 ** TODO Input
 ** TODO Tiles
 ** TODO Player Interface
@@ -31,3 +38,9 @@ In top down view it looks like we are rotated 180 degrees around the z axis
 ** TODO WebGPU Backend
 ** HOLD Music
 ** TODO Loading Textures into AssetDB
+
+** TODO Long period of white window due to assets loading.
+Because we're loading assets into the thing dynamically we don't actually start rendering frames
+til after we've at least read the map file.
+
+We need to have SOMETHING display while files are loading. May mean that we simply paint a loading screen and then init the game state. 

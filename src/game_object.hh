@@ -22,8 +22,9 @@ public:
   GameObject(skyVec3 position) :position(position){};
   //~GameObject();
 
-  virtual void 			update() = 0;
+  virtual void 			update(std::chrono::microseconds dt) = 0;
   virtual void 			display(RenderState &renderState) = 0;
+  virtual bool			load() = 0;
 protected:
   skyVec3 position;
 };
@@ -33,7 +34,7 @@ public:
   RigidBody(skyVec3 position, skyQuat rotation, float scale,
 			GUID textureId, GUID meshId, AssetStore &assetStore);
   //~RigidBody();
-  void 					update();
+  void 					update(std::chrono::microseconds dt);
   void 					display(RenderState &renderState);
   void                  move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw);
   bool 					load();
@@ -45,10 +46,14 @@ private:
   Texture *				texture;
 };
 
+// FIXME(caleb): these are supposed to be always rotated towards the player,
 class Decorator : public GameObject {
 public:
-  Decorator(skyVec3 position, float scale, Texture texture);
-  ~Decorator();
+  Decorator(skyVec3 position, float scale, skyGUID textureId, AssetStore &assetStore);
+  void 					update(std::chrono::microseconds dt);
+  void 					display(RenderState &renderState);
+  bool 					load();
+  //~Decorator();
 private:
   // TODO(caleb): add private copy constructor
   float scale;
@@ -56,3 +61,20 @@ private:
   Texture *texture;
 };
 
+
+class Orc : public GameObject {
+public:
+  Orc(skyVec3 position, AssetStore &assetStore);
+  void 					update(std::chrono::microseconds dt);
+  void 					display(RenderState &renderState);
+  void                  move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw);
+  bool 					load();
+private:
+  // TODO(caleb): add private copy constructor
+  bool isDead = false;
+  skyQuat               rotation;
+  float 				scale;
+  Mesh *				mesh;
+  Texture *				texture;
+
+};
