@@ -17,6 +17,7 @@ layout(location = 6) in int instTexture;
 
 layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoord;
+layout(location = 2) out int fragTexLayer;
 
 mat4 rotationFromQuaternion(vec3 position, vec4 quat) {
 	 float w = quat.x;
@@ -37,4 +38,5 @@ void main() {
   gl_Position = ubo.proj * ubo.view * instTransform * vec4(inPosition * instScale, 1.0);
   fragColor = inColor;
   fragTexCoord = inTexCoord;
+  fragTexLayer = instTexture;
 }

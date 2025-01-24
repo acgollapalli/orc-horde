@@ -17,7 +17,7 @@ SDG                                                                             
 
 #include "renderer.hh" // TODO: Move vertex code to separate file
 
-// TODO: IFDEF THIS:
+// TODO(caleb): move all this to a Plaform specific header full of ifdefs
 struct VulkanBufferInfo {
   VkBuffer buffer;
   VkDeviceMemory memory;
@@ -26,6 +26,16 @@ struct VulkanBufferInfo {
 
 typedef VulkanBufferInfo VertexBuffer_st;
 typedef VulkanBufferInfo IndexBuffer_st;
+
+struct VulkanImageInfo {
+  VkImage image;
+  VkDeviceMemory memory;
+  VkImageView imageView;
+  uint32_t layerOffset;
+};
+
+typedef VulkanImageInfo Image_st;
+// END IFDEF
 
 // TODO: consider replacing with STL style traits class
 typedef enum {
@@ -42,7 +52,7 @@ typedef enum {
   Network_e,
 } AssetLocationType;
 
-typedef std::string GUID;
+typedef std::string skyGUID;
 typedef std::string AssetLocation;
 typedef size_t AssetSize;
 
@@ -62,19 +72,19 @@ struct AssetInfo {
   Asset *asset;
 };
 
-typedef std::unordered_map<GUID, AssetInfo> AssetDB;
+typedef std::unordered_map<skyGUID, AssetInfo> AssetDB;
 
 class AssetStore {
 public:
   AssetStore(Renderer &renderer);
-  void  		    		load(GUID guid);
-  Asset * 					get(GUID guid);
-  Texture *					getTexture(GUID guid); // TODO(caleb): fix this (odin casing instead of C++)
-  Mesh *					getMesh(GUID guid);
-  int 						relinquish(GUID guid); // returns number of other claims on asset
-  void						unload(GUID guid);
-  void						forceUnload(GUID guid);
-  AssetLocation 			getLocation(GUID guid); // SUBJECT TO CHANGES
+  void  		    		load(skyGUID guid);
+  Asset * 					get(skyGUID guid);
+  Texture *					getTexture(skyGUID guid); // TODO(caleb): fix this (odin casing instead of C++)
+  Mesh *					getMesh(skyGUID guid);
+  int 						relinquish(skyGUID guid); // returns number of other claims on asset
+  void						unload(skyGUID guid);
+  void						forceUnload(skyGUID guid);
+  AssetLocation 			getLocation(skyGUID guid); // SUBJECT TO CHANGES
 
 private:
   AssetDB			        assetDb;
@@ -86,12 +96,12 @@ private:
 /* ========================== Asset Classes ==========================*/
 class Asset {
 public:
-  Asset(GUID guid, AssetStore &assetStore, Renderer &renderer); // TODO replace std string with something that isn't std string
+  Asset(skyGUID guid, AssetStore &assetStore, Renderer &renderer); // TODO replace std string with something that isn't std string
   virtual ~Asset();
   // TODO Add copy and move constructors for all these because you do NOT want to be
   // copying all that data around
   
-  GUID 					guid;
+  skyGUID 					guid;
   virtual bool 			load() = 0;   // TODO: maybe this doesn't need to be virtual
   virtual void			unload() = 0; // TODO: maybe this doesn't have to be virtual either
   int					generation = 0; 
@@ -118,10 +128,12 @@ public:
   void              loadLOD(LOD lod[]);
   void              unloadLOD(LOD lod);
   void              unloadLOD(LOD lod[]);
+  uint32_t			getLayerOffset();
   friend class AssetStore;
 private:
-  Texture(GUID guid, AssetStore &assetStore, Renderer &renderer);
+  Texture(skyGUID guid, AssetStore &assetStore, Renderer &renderer);
   std::vector<LOD>	lod;
+  Image_st			image;
 };
 
 // same questions apply, except here we have the additional question of 
@@ -135,11 +147,11 @@ public:
   void						load(LOD lod);
   void						unload();
   void						unload(LOD lod);
-  void 						display(RenderState &renderState, const Instance &thisInstance);
+  void 						display(RenderState &renderState, Instance &thisInstance);
   friend class AssetStore;
   
 private:
-  Mesh(GUID guid, AssetStore &assetStore, Renderer &renderer);
+  Mesh(skyGUID guid, AssetStore &assetStore, Renderer &renderer);
   std::vector<LOD>			lod;
   VertexBuffer_st			vertices_st;
   IndexBuffer_st			indices_st;

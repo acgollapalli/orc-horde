@@ -10,7 +10,7 @@ SDG                                                                             
 #include "game_object.hh"
 
 RigidBody::RigidBody(skyVec3 position, skyQuat rotation, float scale,
-					 GUID textureId, GUID meshId, AssetStore &assetStore)
+					 skyGUID textureId, skyGUID meshId, AssetStore &assetStore)
   : GameObject(position)
   , rotation(rotation)
   , scale(scale)
@@ -27,8 +27,10 @@ void RigidBody::display(RenderState &renderState){
 	.position = position,
 	.rotation = static_cast<skyVec4>(rotation),
 	.scale = scale,
+	.textureIndex = texture->getLayerOffset()
   };
-  return mesh->display(renderState, thisInstance);
+
+  mesh->display(renderState, thisInstance); // NOTE(caleb): this adds instance to renderstate
 }
 
 void RigidBody::move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw) {
@@ -42,17 +44,12 @@ void RigidBody::move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw) {
 
 bool RigidBody::load() {
   bool textureLoaded, meshLoaded;
-  if (texture != nullptr) {
-	textureLoaded = texture->load();
-  } else {
-	textureLoaded = true;
-  }
-  if (mesh != nullptr) {
-	meshLoaded = mesh->load();
-  } else {
-	meshLoaded = true;
-  }
-  std::printf("\n LOADED: %b \n", textureLoaded && meshLoaded);
+  assert(texture != nullptr);
+  assert(mesh != nullptr);
+
+  textureLoaded = texture->load();
+  meshLoaded = mesh->load();
+
   return (textureLoaded && meshLoaded);
 }
 

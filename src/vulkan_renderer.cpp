@@ -1,6 +1,6 @@
 /*
 
-SDG                                                                          JJ
+SDG                                                                                               JJ
 
                                      Orc Horde
 
@@ -27,20 +27,21 @@ SDG                                                                          JJ
 #include <glm/gtc/matrix_transform.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "vendor/stb_image.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "vendor/tiny_obj_loader.h"
 
 #include "renderer.hh"
 
-/* --- pure functions that don't return any class specific data --- */
+/* ================== Pure functions that don't return any class specific data ================== */
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
 									  const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
 									  const VkAllocationCallbacks* pAllocator,
 									  VkDebugUtilsMessengerEXT* pDebugMessenger) {
-  auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+  auto func = (PFN_vkCreateDebugUtilsMessengerEXT)
+	vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+
   if (func != nullptr) {
 	return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
   } else {
@@ -51,7 +52,9 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
 void DestroyDebugUtilsMessengerEXT(VkInstance instance,
 								   VkDebugUtilsMessengerEXT debugMessenger,
 								   const VkAllocationCallbacks* pAllocator) {
-  auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+  auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)
+	vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+
   if (func != nullptr) {
 	func(instance, debugMessenger, pAllocator);
   }
@@ -73,7 +76,7 @@ bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
   return requiredExtensions.empty();
 }
 
-/* =================================== Render State =================================== */
+/* ======================================== Render State ======================================== */
 
 std::vector<RenderOp> RenderState::getRenderOps(Renderer &renderer) {
   std::vector<RenderOp> renderOps;
@@ -96,7 +99,7 @@ std::vector<RenderOp> RenderState::getRenderOps(Renderer &renderer) {
   return renderOps;
 }
 
-/* --- Vulkan Renderer Class Begins Here --- */
+/* ============================ Renderer Class Vulkan Implementation ============================ */
 
 void Renderer::initWindow() {
   std::printf("\n /* ------- INITIALIZING WINDOW ------- */ \n\n");
@@ -129,8 +132,6 @@ void Renderer::initVulkan() {
   createColorResources();
   createDepthResources();
   createFramebuffers();
-  createTextureImage();
-  createTextureImageView();
   createTextureSampler();
   createUniformBuffers();
   createDescriptorPool();
@@ -561,7 +562,7 @@ void Renderer:: createDescriptorSetLayout() {
   VkDescriptorSetLayoutBinding samplerLayoutBinding {
 	.binding = 				1,
 	.descriptorType = 		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-	.descriptorCount = 		1,
+	.descriptorCount = 		MAX_TEXTURES_LOADED,
 	.stageFlags = 			VK_SHADER_STAGE_FRAGMENT_BIT,
 	.pImmutableSamplers = 	nullptr,
   };
@@ -1022,7 +1023,7 @@ void Renderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 }
 
 void Renderer::createImage(uint32_t width, uint32_t height, uint32_t mipLevels,
-						   VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling ,
+						   VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling,
 						   VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
 						   VkImage& image, VkDeviceMemory& imageMemory) {
   VkImageCreateInfo imageInfo{};
@@ -1059,54 +1060,63 @@ void Renderer::createImage(uint32_t width, uint32_t height, uint32_t mipLevels,
   vkBindImageMemory(device, image, imageMemory, 0);
 }
 
-void Renderer::createTextureImage() {
-  int texWidth, texHeight, texChannels;
-  stbi_uc *pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+void Renderer::createTextureImage(stbi_uc *pixels, int texWidth, int texHeight, int texChannels,
+								  VkImage &textureImage, VkDeviceMemory &textureImageMemory,
+								  VkImageView &textureImageView) {
   VkDeviceSize imageSize = texWidth * texHeight * 4;
-  
-  if (!pixels) {
-	throw std::runtime_error("failed to load texture image!");
-  }
-  
+ 
   VkBuffer stagingBuffer;
   VkDeviceMemory stagingBufferMemory;
   
-  createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+  createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			   stagingBuffer, stagingBufferMemory);
   
   void *data;
   vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
   memcpy(data, pixels, static_cast<size_t>(imageSize));
   vkUnmapMemory(device, stagingBufferMemory);
   
-  stbi_image_free(pixels);
   
-  mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
+  auto mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
   
   createImage(texWidth, texHeight, mipLevels, VK_SAMPLE_COUNT_1_BIT,
 			  VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL,
-			  VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			  VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+			  VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+			  VK_IMAGE_USAGE_SAMPLED_BIT,
+			  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 			  textureImage, textureImageMemory);
-  transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipLevels);
-  copyBufferToImage(stagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+
+  transitionImageLayout(textureImage,
+						VK_FORMAT_R8G8B8A8_SRGB,
+						VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+						mipLevels);
+  copyBufferToImage(stagingBuffer, textureImage,
+					static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
   
   // this is now done automatically due to generating mipmaps
-  //transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, mipLevels);
+  //transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB,
+  //VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, mipLevels);
   generateMipmaps(textureImage, VK_FORMAT_R8G8B8A8_SRGB, texWidth, texHeight, mipLevels);
   
   vkDestroyBuffer(device, stagingBuffer, nullptr);
   vkFreeMemory(device, stagingBufferMemory, nullptr);
-}
 
-void Renderer::createTextureImageView() {
-  textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels);
+  textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB,
+									 VK_IMAGE_ASPECT_COLOR_BIT,
+									 mipLevels);
+
 }
 
 // This should be done somewhere before we ever get here.
-void Renderer::generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels) {
+void Renderer::generateMipmaps(VkImage image, VkFormat imageFormat,
+							   int32_t texWidth, int32_t texHeight, uint32_t mipLevels) {
   VkFormatProperties formatProperties;
   vkGetPhysicalDeviceFormatProperties(physicalDevice, imageFormat, &formatProperties);
   
-  if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
+  if (!(formatProperties.optimalTilingFeatures &
+		VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
 	throw std::runtime_error("texture image format does not support linear blitting!");
   }
   
@@ -1296,7 +1306,7 @@ BufferSlice Renderer::writeInstanceBuffer(std::vector<Instance> instances) {
   vkDestroyBuffer(device, stagingBuffer, nullptr);
   vkFreeMemory(device, stagingBufferMemory, nullptr);
 
-  std::printf("Writing buffer at offset %d, with size: %d and first position %f, %f, %fi\n", currentOffset, instances.size(), instances[0].position.x, instances[0].position.y, instances[0].position.z);
+  std::printf("Writing buffer at offset %d, with size: %zd and first position %f, %f, %fi\n", currentOffset, instances.size(), instances[0].position.x, instances[0].position.y, instances[0].position.z);
 
   currentOffset += bufferSize; // TODO(caleb): Handle case where we can overflow this
   assert(currentOffset <= (MAX_GAME_OBJECTS * sizeof(Instance)));
@@ -1328,11 +1338,12 @@ void Renderer::createDescriptorPool() {
 
 void Renderer::createDescriptorSets() {
   std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
-  VkDescriptorSetAllocateInfo allocInfo{};
-  allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-  allocInfo.descriptorPool = descriptorPool;
-  allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-  allocInfo.pSetLayouts = layouts.data();
+  VkDescriptorSetAllocateInfo allocInfo{
+	.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+	.descriptorPool = descriptorPool,
+	.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT),
+	.pSetLayouts = layouts.data(),
+  };
   
   descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
   if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
@@ -1340,39 +1351,77 @@ void Renderer::createDescriptorSets() {
   }
   
   for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-	VkDescriptorBufferInfo bufferInfo{};
-	bufferInfo.buffer = uniformBuffers[i];
-	bufferInfo.offset = 0;
-	bufferInfo.range = sizeof(UniformBufferObject);
+	VkDescriptorBufferInfo bufferInfo{
+	  .buffer = uniformBuffers[i],
+	  .offset = 0,
+	  .range = sizeof(UniformBufferObject),
+	};
+
+	VkWriteDescriptorSet uboDescriptorWrite{
+	  .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+	  .dstSet = descriptorSets[i],
+	  .dstBinding = 0,
+	  .dstArrayElement = 0,
+	  .descriptorCount = 1,
+	  .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+	  .pBufferInfo = &bufferInfo,
+	};
+
+	VkDescriptorImageInfo imageInfo[MAX_TEXTURES_LOADED] {};
+	for (size_t i = 0; i < MAX_TEXTURES_LOADED; i++) {
+	  imageInfo[i] = VkDescriptorImageInfo {
+		.sampler = textureSampler,
+		.imageView = VK_NULL_HANDLE,
+		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+	  };
+	}
 	
-	VkWriteDescriptorSet uboDescriptorWrite{};
-	uboDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	uboDescriptorWrite.dstSet = descriptorSets[i];
-	uboDescriptorWrite.dstBinding = 0;
-	uboDescriptorWrite.dstArrayElement = 0;
-	uboDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	uboDescriptorWrite.descriptorCount = 1;
-	uboDescriptorWrite.pBufferInfo = &bufferInfo;
+	VkWriteDescriptorSet textureDescriptorWrite{
+	  .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+	  .dstSet = descriptorSets[i],
+	  .dstBinding = 1,
+	  .dstArrayElement = 0,
+	  .descriptorCount = MAX_TEXTURES_LOADED,
+	  .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+	  .pImageInfo = imageInfo,
+	};
 	
-	VkDescriptorImageInfo imageInfo{};
-	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = textureImageView;
-	imageInfo.sampler = textureSampler;
+	std::array<VkWriteDescriptorSet, 2> descriptorWrites { uboDescriptorWrite,
+														   textureDescriptorWrite, };
 	
-	VkWriteDescriptorSet textureDescriptorWrite{};
-	textureDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	textureDescriptorWrite.dstSet = descriptorSets[i];
-	textureDescriptorWrite.dstBinding = 1;
-	textureDescriptorWrite.dstArrayElement = 0;
-	textureDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	textureDescriptorWrite.descriptorCount = 1;
-	textureDescriptorWrite.pImageInfo = &imageInfo;
-	
-	std::array<VkWriteDescriptorSet, 2> descriptorWrites { uboDescriptorWrite, textureDescriptorWrite };
-	
-	vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+	vkUpdateDescriptorSets(device,
+						   static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(),
+						   0, nullptr);
   }
 }
+
+void Renderer::addTextureImageToDescriptorSet(VkImageView &imageView, uint32_t &offset) {
+  VkDescriptorImageInfo imageInfo{
+	.sampler = textureSampler,
+	.imageView = imageView,
+	.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+  };
+  
+  
+  for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+	// TODO(caleb): We may want to check a freelist before assigning an image view
+	// to a texture image in the texture array
+	VkWriteDescriptorSet textureDescriptorWrite{
+	  .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+	  .dstSet = descriptorSets[i],
+	  .dstBinding = 1,
+	  .dstArrayElement = numTextures,
+	  .descriptorCount = 1,
+	  .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+	  .pImageInfo = &imageInfo,
+	};
+
+	vkUpdateDescriptorSets(device, 1, &textureDescriptorWrite, 0, nullptr);
+  }
+  
+  offset = numTextures++;
+}
+
 
 void Renderer::createUniformBuffers() {
   VkDeviceSize bufferSize = sizeof(UniformBufferObject);
@@ -1382,7 +1431,9 @@ void Renderer::createUniformBuffers() {
   uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
   
   for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-	createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
+	createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+				 uniformBuffers[i], uniformBuffersMemory[i]);
 	
 	vkMapMemory(device, uniformBuffersMemory[i], 0, bufferSize, 0, &uniformBuffersMapped[i]);
   }
@@ -1676,6 +1727,7 @@ void Renderer::cleanupSwapChain() {
   vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
+// WARNING(caleb): Assets should be unloaded before we get here!!!
 void Renderer::cleanup() {
   std::printf("\n /* ------- SHUTTING DOWN ------- */ \n\n");
   
@@ -1684,10 +1736,6 @@ void Renderer::cleanup() {
   cleanupSwapChain();
   
   vkDestroySampler(device, textureSampler, nullptr);
-  vkDestroyImageView(device, textureImageView, nullptr);
-  
-  vkDestroyImage(device, textureImage, nullptr);
-  vkFreeMemory(device, textureImageMemory, nullptr);
   
   for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 	vkDestroyBuffer(device, uniformBuffers[i], nullptr);
@@ -1849,6 +1897,7 @@ VkSampleCountFlagBits Renderer::getMaxUsableSampleCount() {
   VkSampleCountFlags counts =
 	physicalDeviceProperties.limits.framebufferColorSampleCounts &
 	physicalDeviceProperties.limits.framebufferDepthSampleCounts;
+
   if (counts & VK_SAMPLE_COUNT_64_BIT)  return VK_SAMPLE_COUNT_64_BIT;
   if (counts & VK_SAMPLE_COUNT_32_BIT)  return VK_SAMPLE_COUNT_32_BIT;
   if (counts & VK_SAMPLE_COUNT_16_BIT)  return VK_SAMPLE_COUNT_16_BIT;
@@ -1865,4 +1914,12 @@ void Renderer::destroyBuffer(VkBuffer buffer) {
 
 void Renderer::freeMemory(VkDeviceMemory memory) {
   vkFreeMemory(device, memory, nullptr);
+}
+
+void Renderer::destroyImage(VkImage image) {
+  vkDestroyImage(device, image, nullptr);
+}
+
+void Renderer::destroyImageView(VkImageView imageView) {
+    vkDestroyImageView(device, imageView, nullptr);
 }

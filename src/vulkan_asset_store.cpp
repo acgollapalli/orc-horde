@@ -9,37 +9,59 @@ SDG                                                                             
 
 #include "asset.hh"
 
-const AssetLocation MODEL_PATH = "./models/viking_room/viking_room.obj";
-const GUID MODEL_GUID = "viking_room1234";
+const AssetLocation HOUSE_PATH = "./models/viking_room/viking_room.obj";
+const skyGUID HOUSE_GUID = "viking_room1234";
+
+const AssetLocation HOUSE_TEXTURE_PATH = "./models/viking_room/viking_room.png";
+const skyGUID HOUSE_TEXTURE_GUID = "viking_room1234_tex";
 
 const AssetLocation ORC_PATH = "./models/orc_low_poly/orc_low_poly.obj";
-const GUID ORC_GUID= "orc_low_poly";
+const skyGUID ORC_GUID= "orc_low_poly";
+
+const AssetLocation ORC_TEXTURE_PATH = "./models/orc_low_poly/orc_low_poly.png";
+const skyGUID ORC_TEXTURE_GUID = "orc_low_poly_tex";
 
 AssetStore::AssetStore(Renderer &renderer)
   :renderer(renderer)
 {
-  AssetInfo houseInfo {
+  AssetInfo houseMeshInfo {
 	.type = Mesh_e,
 	.locationType = File_e,
 	.assetSize = 0,
-	.assetLocation = MODEL_PATH,
+	.assetLocation = HOUSE_PATH,
 	.asset = nullptr
   };
-  assetDb[MODEL_GUID] = houseInfo;
+  assetDb[HOUSE_GUID] = houseMeshInfo;
 
+  AssetInfo houseTextureInfo {
+	.type = Texture_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = HOUSE_TEXTURE_PATH,
+	.asset = nullptr,
+  };
+  assetDb[HOUSE_TEXTURE_GUID] = houseTextureInfo;
 
-  AssetInfo orcInfo {
+  AssetInfo orcMeshInfo {
 	.type = Mesh_e,
 	.locationType = File_e,
 	.assetSize = 0,
 	.assetLocation = ORC_PATH,
 	.asset = nullptr
   };
-  assetDb[ORC_GUID] = orcInfo;
+  assetDb[ORC_GUID] = orcMeshInfo;
 
+  AssetInfo orcTextureInfo {
+	.type = Texture_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = ORC_TEXTURE_PATH,
+	.asset = nullptr,
+  };
+  assetDb[ORC_TEXTURE_GUID] = orcTextureInfo;
 }
 
-Asset *AssetStore::get(GUID guid) {
+Asset *AssetStore::get(skyGUID guid) {
   AssetInfo info = assetDb.at(guid);
 
   // TODO(caleb): See how this is used
@@ -64,7 +86,7 @@ Asset *AssetStore::get(GUID guid) {
   }
 }
 
-Texture *AssetStore::getTexture(GUID guid) {
+Texture *AssetStore::getTexture(skyGUID guid) {
   AssetInfo info;
   try {
 	info = assetDb.at(guid);
@@ -81,7 +103,7 @@ Texture *AssetStore::getTexture(GUID guid) {
   }
 }
 
-Mesh *AssetStore::getMesh(GUID guid) {
+Mesh *AssetStore::getMesh(skyGUID guid) {
   AssetInfo info;
   try {
 	info = assetDb.at(guid);
@@ -99,10 +121,9 @@ Mesh *AssetStore::getMesh(GUID guid) {
   }
 }
 
-AssetLocation AssetStore::getLocation(GUID guid) {
+AssetLocation AssetStore::getLocation(skyGUID guid) {
   // TODO(caleb): AssetLocation is a string, should it be a struct
   // with AssetLocationType on it?
-  std::printf("\n\n\n assetDb size: %d \n\n\n", (assetDb.size()));
   AssetInfo info = assetDb[guid];
   return info.assetLocation;
 }

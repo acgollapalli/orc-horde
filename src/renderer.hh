@@ -24,6 +24,8 @@ SDG                                                                          JJ
 #include <glm/glm.hpp>
 #include <glm/gtx/hash.hpp>
 
+#include "vendor/stb_image.h"
+
 const uint32_t INIT_WIN_W = 800;
 const uint32_t INIT_WIN_H = 600;
 
@@ -34,6 +36,7 @@ const std::string TEXTURE_PATH = "./models/viking_room/viking_room.png";
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 const int MAX_GAME_OBJECTS = 4096;
+const int MAX_TEXTURES_LOADED = 1024;
 
 class Asset; // defined in asset.hh
 typedef std::string GUID;
@@ -226,6 +229,13 @@ public:
   void drawFrame(std::vector<RenderOp> renderOps);
   void destroyBuffer(VkBuffer buffer);
   void freeMemory(VkDeviceMemory memory);
+  void destroyImage(VkImage image);
+  void destroyImageView(VkImageView imageView);
+  void createTextureImage(stbi_uc *pixels, int texWidth, int texHeight, int texChannels,
+						  VkImage &textureImage, VkDeviceMemory &textureImageMemory,
+						  VkImageView &textureImageView);
+  void addTextureImageToDescriptorSet(VkImageView &imageView, uint32_t &offset);
+
   
 private:
   /* props */
@@ -267,10 +277,6 @@ private:
   std::vector<void*> uniformBuffersMapped;
   VkDescriptorPool descriptorPool;
   std::vector<VkDescriptorSet> descriptorSets;
-  uint32_t mipLevels;
-  VkImage textureImage;
-  VkDeviceMemory textureImageMemory;
-  VkImageView textureImageView;
   VkSampler textureSampler;
   VkImage depthImage;
   VkDeviceMemory depthImageMemory;
@@ -280,6 +286,7 @@ private:
   VkDeviceMemory colorImageMemory;
   VkImageView colorImageView;
   std::array<BufferAllocation, MAX_FRAMES_IN_FLIGHT> instanceBufferPool;
+  uint32_t numTextures = 0;
   
   /* initialization functions */
   void createInstance();
@@ -297,8 +304,6 @@ private:
   void createColorResources();
   void createDepthResources();
   void createFramebuffers();
-  void createTextureImage();
-  void createTextureImageView();
   void createTextureSampler();
   void createUniformBuffers();
   void createDescriptorPool();

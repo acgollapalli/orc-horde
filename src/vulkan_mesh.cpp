@@ -9,7 +9,7 @@ SDG                                                                             
 
 #include "asset.hh"
 
-Mesh::Mesh(GUID guid, AssetStore &assetStore, Renderer &renderer)
+Mesh::Mesh(skyGUID guid, AssetStore &assetStore, Renderer &renderer)
   : Asset(guid, assetStore, renderer)
 {}
 
@@ -79,7 +79,7 @@ void Mesh::unload() {
 void	Mesh::load(LOD lod) {}
 void	Mesh::unload(LOD lod){}
 
-void Mesh::display (RenderState &renderState, const Instance &thisInstance) {
+void Mesh::display (RenderState &renderState, Instance &thisInstance) {
   Renderable &renderable = renderState.assets[guid];
   if (renderable.numIndices != indices_st.size) {
 	renderable.vertexBuffer = vertices_st.buffer;

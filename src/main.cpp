@@ -31,15 +31,15 @@ GameState initGameState(Renderer &renderer) {;
   skyVec3 position (0.0,0.0,0.0);
   skyQuat rotation = skyQuat::fromAngle(skyVec3(0.0, 1.0, 0.0), PI);
   float scale = 1.0f;
-  RigidBody house = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
+  RigidBody house = RigidBody(position, rotation, scale, "viking_room1234_tex", "viking_room1234", *assetStore);
 
-  RigidBody orc = RigidBody(position, rotation, scale * 0.1, "", "orc_low_poly", *assetStore);
+  RigidBody orc = RigidBody(position, rotation, scale * 0.1, "orc_low_poly_tex", "orc_low_poly", *assetStore);
 
   skyVec3 position2 (0.5,0.5,0.5);
   skyQuat rotation2 = skyQuat::fromAngle(skyVec3(0.0, 1.0, 0.0), PI);
   float scale2 = 1.0f;
 
-  RigidBody house2 = RigidBody(position, rotation, scale, "", "viking_room1234", *assetStore);
+  RigidBody house2 = RigidBody(position, rotation, scale, "viking_room1234_tex", "viking_room1234", *assetStore);
 
   GameState gameState { .assetStore = *assetStore,
 						.gameObjects {house,

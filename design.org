@@ -15,10 +15,10 @@ As you the player get better, you get flashier bigger badder guns and melee weap
 ** DONE Hello Triangle
 ** DONE Loading Meshes into AssetDB
 ** DONE Instanced Rendering of Meshes
-** BUG Rotation
+** KNOWNCAUSE Rotation
 We can rotate, but we may have messed up the handedness of our meshes somehow.
 ** BUG Game crashes on resize
-** TODO Figure out how to get textures for different meshes
+** INPROGRESS Figure out how to get textures for different meshes
 ** TEST World Space to Screen Space Coordinates.
 ** TODO Input
 ** TODO Tiles
