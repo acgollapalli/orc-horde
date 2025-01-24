@@ -28,23 +28,25 @@ struct GameState {
 
 GameState initGameState(Renderer &renderer) {;
   AssetStore *assetStore = new AssetStore(renderer);
+
   skyVec3 position (0.0,0.0,0.0);
-  skyQuat rotation = skyQuat::fromAngle(skyVec3(0.0, 1.0, 0.0), PI);
+  skyQuat rotation = skyQuat::unitVec();
   float scale = 1.0f;
   RigidBody house = RigidBody(position, rotation, scale, "viking_room1234_tex", "viking_room1234", *assetStore);
 
   RigidBody orc = RigidBody(position, rotation, scale * 0.1, "orc_low_poly_tex", "orc_low_poly", *assetStore);
 
-  skyVec3 position2 (0.5,0.5,0.5);
-  skyQuat rotation2 = skyQuat::fromAngle(skyVec3(0.0, 1.0, 0.0), PI);
-  float scale2 = 1.0f;
-
   RigidBody house2 = RigidBody(position, rotation, scale, "viking_room1234_tex", "viking_room1234", *assetStore);
 
+  RigidBody map = RigidBody(position, rotation, 11.4, MAP_TEXTURE_GUID, DECORATOR_GUID, *assetStore);
+
   GameState gameState { .assetStore = *assetStore,
-						.gameObjects {house,
-									  orc,
-									  house2},};
+						.gameObjects {
+						  house,
+						  orc,
+						  house2,
+						  map,
+						},};
 
 
   // TODO(caleb): This should probabaly be assigned to a job queue somewhere
@@ -72,13 +74,21 @@ void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::durati
 	//							  skyVec3(0.0, 0.0, 0.0),
 	//							  skyVec3(0.0, 0.000001, 0.0 ));
 
+	// orc
 	gameState.gameObjects[0].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
 								  skyVec3(0.0, 0.000001, 0.0),
 								  skyVec3(0.0, 0.0, 0.000001));
 
+	// other house
 	gameState.gameObjects[1].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
-								  skyVec3(.0000001, 0.0, -0.0000001),
-								  skyVec3(0.0, 0.0, 0.000001));
+								  skyVec3(0.0, 0.0, 0.0000001),
+								  skyVec3(0.0, 0.0, 0.0));
+
+	// map
+	//gameState.gameObjects[3].move(std::chrono::duration_cast<std::chrono::microseconds>(dt),
+	//							  skyVec3(0.0, 0.0, -0.0000001),
+	//							  skyVec3(0.0, 0.0, 0.0));
+
   }
 
   auto ops = renderState.getRenderOps(renderer);

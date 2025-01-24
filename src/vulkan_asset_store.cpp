@@ -9,18 +9,6 @@ SDG                                                                             
 
 #include "asset.hh"
 
-const AssetLocation HOUSE_PATH = "./models/viking_room/viking_room.obj";
-const skyGUID HOUSE_GUID = "viking_room1234";
-
-const AssetLocation HOUSE_TEXTURE_PATH = "./models/viking_room/viking_room.png";
-const skyGUID HOUSE_TEXTURE_GUID = "viking_room1234_tex";
-
-const AssetLocation ORC_PATH = "./models/orc_low_poly/orc_low_poly.obj";
-const skyGUID ORC_GUID= "orc_low_poly";
-
-const AssetLocation ORC_TEXTURE_PATH = "./models/orc_low_poly/orc_low_poly.png";
-const skyGUID ORC_TEXTURE_GUID = "orc_low_poly_tex";
-
 AssetStore::AssetStore(Renderer &renderer)
   :renderer(renderer)
 {
@@ -59,6 +47,24 @@ AssetStore::AssetStore(Renderer &renderer)
 	.asset = nullptr,
   };
   assetDb[ORC_TEXTURE_GUID] = orcTextureInfo;
+
+  AssetInfo mapTextureInfo {
+	.type = Texture_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = MAP_TEXTURE_PATH,
+	.asset = nullptr,
+  };
+  assetDb[MAP_TEXTURE_GUID] = mapTextureInfo;
+
+  AssetInfo decoratorMeshInfo {
+	.type = Mesh_e,
+	.locationType = Computed_e,
+	.assetSize = 0,
+	.assetLocation = "", // TODO(caleb): add a way to get a computed value here
+	.asset = nullptr,
+  };
+  assetDb[DECORATOR_GUID] = decoratorMeshInfo;
 }
 
 Asset *AssetStore::get(skyGUID guid) {
@@ -127,3 +133,12 @@ AssetLocation AssetStore::getLocation(skyGUID guid) {
   AssetInfo info = assetDb[guid];
   return info.assetLocation;
 }
+
+
+AssetLocationType AssetStore::getLocationType(skyGUID guid) {
+  // TODO(caleb): AssetLocation is a string, should it be a struct
+  // with AssetLocationType on it?
+  AssetInfo info = assetDb[guid];
+  return info.locationType;
+}
+

@@ -18,6 +18,9 @@ export CXX=/usr/bin/g++-14
 echo "\n----COMPILING SHADERS---\n"
 ./compile_shaders.sh
 
+cp -r ../models .
+cp -r ../textures .
+
 # compile game
 echo "\n---COMPILING GAME---\n"
 cd build

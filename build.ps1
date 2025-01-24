@@ -23,8 +23,15 @@ cmake.exe --build .
 
 cp -r -Force shaders Debug/
 cp -r -Force ../models Debug/
+cp -r -Force ../textures Debug/
 
 if ($args[0] -eq "run") {
+   cd Debug
+   .\orc_horde.exe
+   cd ..
+}
+
+if ($args[0] -eq "debug") {
 	c:\raddbg\raddbg.exe .\Debug\orc_horde.exe
 }
 

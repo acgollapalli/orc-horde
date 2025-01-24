@@ -83,8 +83,8 @@ struct skyQuat {
 
   static const skyQuat unitVec() {
 	skyQuat q;
-	q.x = q.y = q.z = 1 / std::sqrt(3.0);
-	q.w = 0;
+	q.x = q.y = q.z = 0;
+	q.w = 1;
 	return q;
   }
 

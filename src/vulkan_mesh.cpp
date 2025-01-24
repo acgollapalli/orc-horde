@@ -16,6 +16,16 @@ Mesh::Mesh(skyGUID guid, AssetStore &assetStore, Renderer &renderer)
 bool Mesh::load() {
   if (loaded) return true;
 
+  switch (assetStore.getLocationType(guid)) {
+  case File_e: 		return loadFromFile();
+  case Computed_e:	return loadComputed();
+  default: 			throw std::logic_error("Only file and computed meshes can be loaded for meshes");
+  }
+
+  return false;
+}
+
+bool Mesh::loadFromFile() {
   std::string modelPath = assetStore.getLocation(guid);
 
   tinyobj::attrib_t attrib;
@@ -59,6 +69,26 @@ bool Mesh::load() {
 	}
   }
 
+  vertices_st.size = static_cast<uint32_t>(vertices.size()); // not currently used
+  indices_st.size = static_cast<uint32_t>(indices.size());
+  renderer.createVertexBuffer(vertices, vertices_st.buffer, vertices_st.memory);
+  renderer.createIndexBuffer(indices, indices_st.buffer, indices_st.memory);
+  return true;
+}
+
+// TODO(Caleb): You want to get passed a function pointer or something here
+// but right now the only thing we're computing is the Plane shape so we don't generalize it.
+bool Mesh::loadComputed() {
+  const std::vector<Vertex> vertices = {
+	/*     Position                 Color           Texture (UV) */
+	{ {-0.5f, -0.5f, 0.0f},	 {1.0f, 0.0f, 0.0f}, 	{0.0f, 0.0f} },
+    { {0.5f, -0.5f, 0.0f},	 {0.0f, 1.0f, 0.0f}, 	{1.0f, 0.0f} },
+    { {0.5f, 0.5f, 0.0f}, 	 {0.0f, 0.0f, 1.0f}, 	{1.0f, 1.0f} },
+    { {-0.5f, 0.5f, 0.0f},	 {1.0f, 1.0f, 1.0f}, 	{0.0f, 1.0f} }
+  };
+  
+  const std::vector<Index> indices = { 0, 1, 2, 2, 3, 0 };
+  
   vertices_st.size = static_cast<uint32_t>(vertices.size()); // not currently used
   indices_st.size = static_cast<uint32_t>(indices.size());
   renderer.createVertexBuffer(vertices, vertices_st.buffer, vertices_st.memory);

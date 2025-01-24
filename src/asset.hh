@@ -50,6 +50,7 @@ typedef enum {
 typedef enum {
   File_e,
   Network_e,
+  Computed_e,
 } AssetLocationType;
 
 typedef std::string skyGUID;
@@ -62,6 +63,23 @@ typedef int LOD;
 class Asset;
 class Mesh;
 class Texture;
+
+const AssetLocation HOUSE_PATH = "./models/viking_room/viking_room.obj";
+const skyGUID HOUSE_GUID = "viking_room1234";
+
+const AssetLocation HOUSE_TEXTURE_PATH = "./models/viking_room/viking_room.png";
+const skyGUID HOUSE_TEXTURE_GUID = "viking_room1234_tex";
+
+const AssetLocation ORC_PATH = "./models/orc_low_poly/orc_low_poly.obj";
+const skyGUID ORC_GUID= "orc_low_poly";
+
+const AssetLocation ORC_TEXTURE_PATH = "./models/orc_low_poly/orc_low_poly.png";
+const skyGUID ORC_TEXTURE_GUID = "orc_low_poly_tex";
+
+const AssetLocation MAP_TEXTURE_PATH = "./textures/base_map.png";
+const skyGUID MAP_TEXTURE_GUID = "base_map_tex";
+
+const skyGUID DECORATOR_GUID = "DECORATOR_PANEL";
 
 /* ========================== Asset Storage ==========================*/
 struct AssetInfo {
@@ -85,6 +103,7 @@ public:
   void						unload(skyGUID guid);
   void						forceUnload(skyGUID guid);
   AssetLocation 			getLocation(skyGUID guid); // SUBJECT TO CHANGES
+  AssetLocationType			getLocationType(skyGUID guid); // subject to changes
 
 private:
   AssetDB			        assetDb;
@@ -155,6 +174,8 @@ private:
   std::vector<LOD>			lod;
   VertexBuffer_st			vertices_st;
   IndexBuffer_st			indices_st;
+  bool						loadFromFile();
+  bool						loadComputed();
 };
 
 
