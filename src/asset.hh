@@ -87,18 +87,35 @@ const skyGUID MAP_TEXTURE_GUID = "base_map_tex";
 
 const skyGUID DECORATOR_GUID = "DECORATOR_PANEL";
 
-// TODO(caleb): make meshes for these
+const AssetLocation BULLET_TEXTURE_PATH_SUPER   = "./models/bullet/bullet_super.png";
 const skyGUID BULLET_TEXTURE_GUID_SUPER   = "bullet_texture_guid_super";
+
+const AssetLocation BULLET_TEXTURE_PATH_REGULAR = "./models/bullet/bullet_regular.png";
 const skyGUID BULLET_TEXTURE_GUID_REGULAR = "bullet_texture_guid_regular"; 
+
+const AssetLocation BULLET_MESH_PATH_SUPER = "./models/bullet/bullet_super.obj";
 const skyGUID BULLET_MESH_GUID_SUPER      = "bullet_mesh_guid_super";  
+
+const AssetLocation BULLET_MESH_PATH_REGULAR = "./models/bullet/bullet_regular.obj";
 const skyGUID BULLET_MESH_GUID_REGULAR    = "bullet_mesh_guid_regular";
 
+const AssetLocation EXPLOSION_PATH = ".models/explosion/explosion_regular.obj";
 const skyGUID EXPLOSION_GUID = "EXPLOSION";
+
+const AssetLocation SUPER_EXPLOSION_PATH = ".models/explosion/explosion_super.obj";
 const skyGUID SUPER_EXPLOSION_GUID = "SUPER_EXPLOSION";
+
+const AssetLocation EXPLOSION_TEXTURE_PATH = ".models/explosion/explosion_regular.png";
+const skyGUID EXPLOSION_TEXTURE_GUID = "EXPLOSION_TEX";
+
+const AssetLocation SUPER_EXPLOSION_TEXTURE_PATH = ".models/explosion/explosion_super.png";
+const skyGUID SUPER_EXPLOSION_TEXTURE_GUID = "SUPER_EXPLOSION_TEX";
+
+// TODO(caleb): make meshes for these
+const AssetLocation HUMAN_DEAD_PATH = "./models/human_low_poly/human_low_poly.obj";
 const skyGUID HUMAN_DEAD_GUID = "HUMAN_DEAD";
 
-const skyGUID EXPLOSION_TEXTURE_GUID = "EXPLOSION_TEX";
-const skyGUID SUPER_EXPLOSION_TEXTURE_GUID = "SUPER_EXPLOSION_TEX";
+const AssetLocation HUMAN_DEAD_TEXTURE_PATH = "./models/human_low_poly/death_low_poly.png";
 const skyGUID HUMAN_DEAD_TEXTURE_GUID = "HUMAN_DEAD_TEXTURE";
 
 /* ========================== Asset Storage ==========================*/
