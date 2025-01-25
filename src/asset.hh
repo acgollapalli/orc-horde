@@ -76,10 +76,30 @@ const skyGUID ORC_GUID= "orc_low_poly";
 const AssetLocation ORC_TEXTURE_PATH = "./models/orc_low_poly/orc_low_poly.png";
 const skyGUID ORC_TEXTURE_GUID = "orc_low_poly_tex";
 
+const AssetLocation HUMAN_PATH = "./models/human_low_poly/human_low_poly.obj";
+const skyGUID HUMAN_GUID= "human_low_poly";
+
+const AssetLocation HUMAN_TEXTURE_PATH = "./models/human_low_poly/human_low_poly.png";
+const skyGUID HUMAN_TEXTURE_GUID = "human_low_poly_tex";
+
 const AssetLocation MAP_TEXTURE_PATH = "./textures/base_map.png";
 const skyGUID MAP_TEXTURE_GUID = "base_map_tex";
 
 const skyGUID DECORATOR_GUID = "DECORATOR_PANEL";
+
+// TODO(caleb): make meshes for these
+const skyGUID BULLET_TEXTURE_GUID_SUPER   = "bullet_texture_guid_super";
+const skyGUID BULLET_TEXTURE_GUID_REGULAR = "bullet_texture_guid_regular"; 
+const skyGUID BULLET_MESH_GUID_SUPER      = "bullet_mesh_guid_super";  
+const skyGUID BULLET_MESH_GUID_REGULAR    = "bullet_mesh_guid_regular";
+
+const skyGUID EXPLOSION_GUID = "EXPLOSION";
+const skyGUID SUPER_EXPLOSION_GUID = "SUPER_EXPLOSION";
+const skyGUID HUMAN_DEAD_GUID = "HUMAN_DEAD";
+
+const skyGUID EXPLOSION_TEXTURE_GUID = "EXPLOSION_TEX";
+const skyGUID SUPER_EXPLOSION_TEXTURE_GUID = "SUPER_EXPLOSION_TEX";
+const skyGUID HUMAN_DEAD_TEXTURE_GUID = "HUMAN_DEAD_TEXTURE";
 
 /* ========================== Asset Storage ==========================*/
 struct AssetInfo {

@@ -19,7 +19,7 @@ Decorator::Decorator(skyVec3 position, float scale, skyGUID textureId, AssetStor
   mesh = assetStore.getMesh(DECORATOR_GUID);
 }
 
-void Decorator::update(std::chrono::microseconds dt){}
+GameOps Decorator::update(std::chrono::microseconds dt, GameState &gameState){ return {}; }
 
 void Decorator::display(RenderState &renderState){
   Instance thisInstance {

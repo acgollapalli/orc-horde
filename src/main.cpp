@@ -2,32 +2,16 @@
 
 SDG                                                                                               JJ
 
-                                               Orc Horde
+                                             Orc Horde
 
 									A Game Made (almost) from scratch
 */
 
-#include <iostream>
-#include <stdexcept>
-#include <chrono>
-#include <random>
+
 
 #include "game_object.hh"
 
-#ifndef PI
-#define PI 3.14159
-#endif
-
-using namespace std::literals;
-
 std::chrono::duration MIN_FRAME_TIME = 1ms;
-
-int ORCS_PER_FRAME = 1; // FIXME(caleb): need this to be per ms
-
-struct GameState {
-  AssetStore &assetStore;
-  std::vector<GameObject*> gameObjects;
-};
 
 GameState initGameState(Renderer &renderer) {;
   AssetStore *assetStore = new AssetStore(renderer);
@@ -45,7 +29,6 @@ GameState initGameState(Renderer &renderer) {;
   
   GameState gameState { .assetStore = *assetStore,
 						.gameObjects {orc, map},};
-
 
   // TODO(caleb): This should probably be assigned to a job queue when we get to that point
   bool loadingAssets= true;
@@ -67,12 +50,11 @@ void spawnOrcs(GameState &gameState) {
 
     float x_rand = distribution(generator);
 
-	GameObject *orc = new Orc(skyVec3(x_rand, 4.0, 0.0), gameState.assetStore);
+	GameObject *orc = new Orc(skyVec3(x_rand, 4.4, 0.0), gameState.assetStore);
 
 	gameState.gameObjects.push_back(orc);
   }
 }
-
 
 void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::duration<float> dt) {
   RenderState renderState = {};
@@ -82,7 +64,7 @@ void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::durati
   spawnOrcs(gameState);
   
   for (auto& obj : gameState.gameObjects) {
-	obj->update(dt_micros);
+	obj->update(dt_micros, gameState);
 	obj->display(renderState);
   }
 

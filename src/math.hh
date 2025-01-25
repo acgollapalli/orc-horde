@@ -99,3 +99,7 @@ struct skyQuat {
 
   explicit operator skyVec4() const { return skyVec4(w, x, y, z); }
 };
+
+static float norm(skyVec3 v) {
+  return std::sqrt( v.x * v.x + v.y * v.y * v.z * v.z);
+}

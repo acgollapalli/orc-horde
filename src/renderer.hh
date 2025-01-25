@@ -26,6 +26,9 @@ SDG                                                                          JJ
 
 #include "vendor/stb_image.h"
 
+const float WORLD_TOP_COORD = 5.4;
+const float WORLD_RIGHT_COORD = 12.0;
+
 const uint32_t INIT_WIN_W = 800;
 const uint32_t INIT_WIN_H = 600;
 
@@ -35,7 +38,7 @@ const uint32_t INIT_WIN_H = 600;
 const std::string TEXTURE_PATH = "./models/viking_room/viking_room.png";
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
-const int MAX_GAME_OBJECTS = 4096;
+const int MAX_GAME_OBJECTS = 8092;
 const int MAX_TEXTURES_LOADED = 1024;
 
 class Asset; // defined in asset.hh
