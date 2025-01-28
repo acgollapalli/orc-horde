@@ -22,13 +22,13 @@ GameState initGameState(Renderer &renderer) {;
   GameObject *map = new RigidBody(position, rotation, 11.4,
 								MAP_TEXTURE_GUID, DECORATOR_GUID, *assetStore);
 
-  skyVec3 orcPosition(0.0, 5.0, 0.0); // spawn one orce offscreen to force asset loading
   GameObject *orc = new Orc(skyVec3(0.0, 4.0, 0.0), *assetStore);
+  GameObject *human = new Human(skyVec3(0.0, -4.0, 0.0), *assetStore);
 
   // TODO(caleb): add a human to span here as well, once we have the human assets.
   
   GameState gameState { .assetStore = *assetStore,
-						.gameObjects {orc, map},};
+						.gameObjects {orc, human, map},};
 
   // TODO(caleb): This should probably be assigned to a job queue when we get to that point
   bool loadingAssets= true;
@@ -43,7 +43,7 @@ GameState initGameState(Renderer &renderer) {;
 }
 
 void spawnOrcs(GameState &gameState) {
-  for (int i = 0; i < ORCS_PER_FRAME && gameState.gameObjects.size() < MAX_GAME_OBJECTS; i++) {
+  for (int i = 0; i < ORCS_PER_FRAME && gameState.gameObjects.size() < MAX_GAME_OBJECTS/2; i++) {
     std::random_device rd;
     std::mt19937 generator(rd());
     std::uniform_real_distribution<float> distribution(-5.4, 5.4);
@@ -56,12 +56,27 @@ void spawnOrcs(GameState &gameState) {
   }
 }
 
+void spawnHumans(GameState &gameState) {
+  for (int i = 0; i < HUMANS_PER_FRAME && gameState.gameObjects.size() < MAX_GAME_OBJECTS/2; i++) {
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_real_distribution<float> distribution(-5.4, 5.4);
+
+    float x_rand = distribution(generator);
+
+	GameObject *human = new Human(skyVec3(x_rand, -2.4, 0.0), gameState.assetStore);
+
+	gameState.gameObjects.push_back(human);
+  }
+}
+
 void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::duration<float> dt) {
   RenderState renderState = {};
 
   auto dt_micros = std::chrono::duration_cast<std::chrono::microseconds>(dt);
 
-  spawnOrcs(gameState);
+  //spawnOrcs(gameState);
+  //spawnHumans(gameState);
   
   for (auto& obj : gameState.gameObjects) {
 	obj->update(dt_micros, gameState);

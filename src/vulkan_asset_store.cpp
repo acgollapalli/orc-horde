@@ -65,6 +65,117 @@ AssetStore::AssetStore(Renderer &renderer)
 	.asset = nullptr,
   };
   assetDb[DECORATOR_GUID] = decoratorMeshInfo;
+
+  AssetInfo humanMeshInfo {
+	.type = Mesh_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = HUMAN_PATH,
+	.asset = nullptr
+  };
+  assetDb[HUMAN_GUID] = humanMeshInfo;
+
+  AssetInfo humanTextureInfo {
+	.type = Texture_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = HUMAN_TEXTURE_PATH,
+	.asset = nullptr,
+  };
+  assetDb[HUMAN_TEXTURE_GUID] = humanTextureInfo;
+
+  AssetInfo bulletRegularMeshInfo {
+	.type = Mesh_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = BULLET_MESH_PATH_REGULAR,
+	.asset = nullptr
+  };
+  assetDb[BULLET_MESH_GUID_REGULAR] = bulletRegularMeshInfo;
+
+  AssetInfo bulletRegularTextureInfo {
+	.type = Texture_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = BULLET_TEXTURE_PATH_REGULAR,
+	.asset = nullptr,
+  };
+  assetDb[BULLET_TEXTURE_GUID_REGULAR] = bulletRegularTextureInfo;
+
+  AssetInfo bulletSuperMeshInfo {
+	.type = Mesh_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = BULLET_MESH_PATH_SUPER,
+	.asset = nullptr
+  };
+  assetDb[BULLET_MESH_GUID_SUPER] = bulletSuperMeshInfo;
+
+  AssetInfo bulletSuperTextureInfo {
+	.type = Texture_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = BULLET_TEXTURE_PATH_SUPER,
+	.asset = nullptr,
+  };
+  assetDb[BULLET_TEXTURE_GUID_SUPER] = bulletSuperTextureInfo;
+
+  AssetInfo explosionMeshInfo {
+	.type = Mesh_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = EXPLOSION_PATH,
+	.asset = nullptr
+  };
+  assetDb[EXPLOSION_GUID] = explosionMeshInfo;
+
+  AssetInfo explosionTextureInfo {
+	.type = Texture_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = EXPLOSION_TEXTURE_PATH,
+	.asset = nullptr,
+  };
+  assetDb[EXPLOSION_TEXTURE_GUID] = explosionTextureInfo;
+
+  AssetInfo explosionSuperMeshInfo {
+	.type = Mesh_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = SUPER_EXPLOSION_PATH,
+	.asset = nullptr
+  };
+  assetDb[SUPER_EXPLOSION_GUID] = explosionSuperMeshInfo;
+
+  AssetInfo explosionSuperTextureInfo {
+	.type = Texture_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = SUPER_EXPLOSION_TEXTURE_PATH,
+	.asset = nullptr,
+  };
+  assetDb[SUPER_EXPLOSION_TEXTURE_GUID] = explosionSuperTextureInfo;
+
+  AssetInfo humanDeadMeshInfo {
+	.type = Mesh_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = HUMAN_DEAD_PATH,
+	.asset = nullptr
+  };
+  assetDb[HUMAN_DEAD_GUID] = humanDeadMeshInfo;
+
+  AssetInfo humanDeadTextureInfo{
+	.type = Mesh_e,
+	.locationType = File_e,
+	.assetSize = 0,
+	.assetLocation = HUMAN_DEAD_TEXTURE_PATH,
+	.asset = nullptr
+  };
+  assetDb[HUMAN_DEAD_TEXTURE_GUID] = humanDeadTextureInfo;
+
+  
+
 }
 
 Asset *AssetStore::get(skyGUID guid) {
