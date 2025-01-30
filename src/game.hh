@@ -26,13 +26,18 @@ enum GameOpType {
   DeleteSelf_e,
 };
 
-struct GameState {
-  AssetStore &assetStore;
-  std::vector<GameObject*> gameObjects;
-};
-
 
 struct GameOp {
   GameOpType 	type;
   GameObject *  operand;
 };
+
+struct GameState {
+  AssetStore &assetStore;
+  std::vector<GameObject*> gameObjects;
+  std::vector<GameOp> mailbox;
+};
+
+
+		  
+

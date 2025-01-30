@@ -35,6 +35,7 @@ public:
   GameObject(skyVec3 position) :position(position){};
   //~GameObject();
 
+  
   virtual GameOps 		update(std::chrono::microseconds dt, GameState &gameState) = 0;
   virtual void 			display(RenderState &renderState) = 0;
   virtual bool			load() = 0;
@@ -42,6 +43,8 @@ public:
   //protected:
   skyVec3 				position;
   GameObjectType		type;
+  std::vector<GameOp>   mailbox;
+  uint32_t				generation = 0;
 };
 
 inline GameOps GameObject::kill(GameState &gameState) {

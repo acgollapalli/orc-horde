@@ -28,7 +28,7 @@ Bullet::Bullet(skyVec3 position, skyVec3 direction, bool superBullet, AssetStore
   , direction(direction)
   , superBullet(superBullet)
   , rotation(skyQuat::unitVec())
-  , scale(1.0f)
+  , scale(0.1f)
 {
   glm::normalize(direction);
 

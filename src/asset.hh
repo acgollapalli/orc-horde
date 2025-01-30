@@ -71,13 +71,13 @@ const AssetLocation HOUSE_TEXTURE_PATH = "./models/viking_room/viking_room.png";
 const skyGUID HOUSE_TEXTURE_GUID = "viking_room1234_tex";
 
 const AssetLocation ORC_PATH = "./models/orc_low_poly/orc_low_poly.obj";
-const skyGUID ORC_GUID= "orc_low_poly";
+const skyGUID ORC_GUID = "orc_low_poly";
 
 const AssetLocation ORC_TEXTURE_PATH = "./models/orc_low_poly/orc_low_poly.png";
 const skyGUID ORC_TEXTURE_GUID = "orc_low_poly_tex";
 
 const AssetLocation HUMAN_PATH = "./models/human_low_poly/human_low_poly.obj";
-const skyGUID HUMAN_GUID= "human_low_poly";
+const skyGUID HUMAN_GUID = "human_low_poly";
 
 const AssetLocation HUMAN_TEXTURE_PATH = "./models/human_low_poly/human_low_poly.png";
 const skyGUID HUMAN_TEXTURE_GUID = "human_low_poly_tex";
@@ -99,25 +99,49 @@ const skyGUID BULLET_MESH_GUID_SUPER      = "bullet_mesh_guid_super";
 const AssetLocation BULLET_MESH_PATH_REGULAR = "./models/bullet/bullet.obj";
 const skyGUID BULLET_MESH_GUID_REGULAR    = "bullet_mesh_guid_regular";  // NOTE: these are the same
 
-const AssetLocation EXPLOSION_PATH = ".models/explosion/explosion_regular.obj";
+const AssetLocation EXPLOSION_PATH = "./models/explosion/explosion_regular.obj";
 const skyGUID EXPLOSION_GUID = "EXPLOSION";
 
-const AssetLocation SUPER_EXPLOSION_PATH = ".models/explosion/explosion_super.obj";
+const AssetLocation SUPER_EXPLOSION_PATH = "./models/explosion/explosion_super.obj";
 const skyGUID SUPER_EXPLOSION_GUID = "SUPER_EXPLOSION";
 
-const AssetLocation EXPLOSION_TEXTURE_PATH = ".models/explosion/explosion_regular.png";
+const AssetLocation EXPLOSION_TEXTURE_PATH = "./models/explosion/explosion_regular.png";
 const skyGUID EXPLOSION_TEXTURE_GUID = "EXPLOSION_TEX";
 
-const AssetLocation SUPER_EXPLOSION_TEXTURE_PATH = ".models/explosion/explosion_super.png";
+const AssetLocation SUPER_EXPLOSION_TEXTURE_PATH = "./models/explosion/explosion_super.png";
 const skyGUID SUPER_EXPLOSION_TEXTURE_GUID = "SUPER_EXPLOSION_TEX";
 
 const AssetLocation HUMAN_DEAD_PATH = "./models/human_low_poly/human_low_poly.obj";
-const skyGUID HUMAN_DEAD_GUID = "HUMAN_DEAD";
+const skyGUID HUMAN_DEAD_GUID = "HUMAN_DEAD"; // NOTE: these are the same
 
 const AssetLocation HUMAN_DEAD_TEXTURE_PATH = "./models/human_low_poly/death_low_poly.png";
-const skyGUID HUMAN_DEAD_TEXTURE_GUID = "HUMAN_DEAD_TEXTURE"; // NOTE: these are the same
+const skyGUID HUMAN_DEAD_TEXTURE_GUID = "HUMAN_DEAD_TEXTURE"; 
 
+const std::vector<skyGUID> ALL_GAME_ASSETS {
+  HOUSE_GUID,
+  HOUSE_TEXTURE_GUID,
+  ORC_GUID,
+  ORC_TEXTURE_GUID,
+  HUMAN_GUID,
+  HUMAN_TEXTURE_GUID,
+  MAP_TEXTURE_GUID,
+  DECORATOR_GUID,
+  BULLET_TEXTURE_GUID_SUPER,
+  BULLET_TEXTURE_GUID_REGULAR,
+  BULLET_MESH_GUID_SUPER,
+  BULLET_MESH_GUID_REGULAR,
+  EXPLOSION_GUID,
+  SUPER_EXPLOSION_GUID,
+  EXPLOSION_TEXTURE_GUID,
+  SUPER_EXPLOSION_TEXTURE_GUID,
+  HUMAN_DEAD_GUID,
+  HUMAN_DEAD_TEXTURE_GUID,
+}; // to be passed to load
+// NOTE: while you could write a function to do all this, I don't want
+// the asset store to work that way. The idea is that you'd be able to
+// load various zones. This is just a lazy version for initial implementation.
 
+  
 /* ========================== Asset Storage ==========================*/
 struct AssetInfo {
   AssetType type;
@@ -132,7 +156,8 @@ typedef std::unordered_map<skyGUID, AssetInfo> AssetDB;
 class AssetStore {
 public:
   AssetStore(Renderer &renderer);
-  void  		    		load(skyGUID guid);
+  bool  		    		load(skyGUID guid);
+  bool						load(std::vector<skyGUID> guids);
   Asset * 					get(skyGUID guid);
   Texture *					getTexture(skyGUID guid); // TODO(caleb): fix this (odin casing instead of C++)
   Mesh *					getMesh(skyGUID guid);

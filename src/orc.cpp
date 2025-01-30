@@ -62,13 +62,9 @@ void Orc::display(RenderState &renderState){ // TODO(caleb): account for death a
 }
 
 void Orc::move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw) {
-  std::printf("Moving orc from %f", position);
-
   float dt_micros= static_cast<float>(dt.count());
   position += dv * dt_micros;
   
-  std::printf(" to %f \n", position);
-
   // assume dw is an angular velocity
   rotation += skyQuat{0.0f, dw.x, dw.y, dw.z} * rotation * (dt_micros / 2.0f);
   rotation.normalize();

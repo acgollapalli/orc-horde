@@ -1,5 +1,7 @@
 # abort if any command fails
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+$PSNativeCommandUseErrorActionPreference = $true # might be true by default
 
 cd $PSScriptRoot
 

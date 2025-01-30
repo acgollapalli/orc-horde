@@ -166,16 +166,27 @@ AssetStore::AssetStore(Renderer &renderer)
   assetDb[HUMAN_DEAD_GUID] = humanDeadMeshInfo;
 
   AssetInfo humanDeadTextureInfo{
-	.type = Mesh_e,
+	.type = Texture_e,
 	.locationType = File_e,
 	.assetSize = 0,
 	.assetLocation = HUMAN_DEAD_TEXTURE_PATH,
 	.asset = nullptr
   };
   assetDb[HUMAN_DEAD_TEXTURE_GUID] = humanDeadTextureInfo;
+}
 
-  
+bool AssetStore::load(skyGUID guid) {
+  Asset *asset = get(guid);
+  std::printf("loading %s\n", guid.c_str());
+  return asset->load();
+}
 
+bool AssetStore::load(std::vector<skyGUID> guids) {
+  bool allLoaded = true;
+  for ( skyGUID guid : guids ) {
+	allLoaded == allLoaded && load(guid);
+  }
+  return allLoaded;
 }
 
 Asset *AssetStore::get(skyGUID guid) {
@@ -207,6 +218,9 @@ Texture *AssetStore::getTexture(skyGUID guid) {
   AssetInfo info;
   try {
 	info = assetDb.at(guid);
+	if (info.type != Texture_e) {
+	  std::printf("Got bad GUID %s \n", guid);
+	}
 	assert(info.type == Texture_e);
   } catch (const std::out_of_range& ex) {
 	return nullptr; // TODO: remove this eventually

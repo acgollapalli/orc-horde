@@ -25,6 +25,9 @@ Human::Human(skyVec3 position, AssetStore &assetStore)
   : GameObject(position)
   , rotation(skyQuat::unitVec())
   , scale(0.1f)
+  , usSinceLastFired(1000 / 60)
+  , blessed(false)
+	
 {
   // TODO(caleb): we may need to handle the case later on that we may pass in
   // a guid that does not return that type
@@ -39,13 +42,18 @@ GameOps Human::update(std::chrono::microseconds dt, GameState &gameState){
   int fire_rate = (blessed) ? FIRE_RATE_BLESSED : FIRE_RATE_REGULAR;
   float movement_rate = (blessed) ? MOVEMENT_RATE_BLESSED : MOVEMENT_RATE_REGULAR;
 
-  if ((usSinceLastFired += dt.count()) > fire_rate * 1000) {
+  int fire_ms = 1000 / fire_rate;
+
+  if ((usSinceLastFired += dt.count()) > fire_ms) {
 	Location orcLocation = findNearestOrc(gameState);
 	if (orcLocation.y < WORLD_TOP_COORD) {
+	  std::printf("Shooting orc at %zf, %zf, %zf\n", orcLocation.x, orcLocation.y, orcLocation.z);
 	  auto fire_op = fireAtOrc(orcLocation, gameState);
 	  ops.push_back(fire_op);
 	  usSinceLastFired = 0;
 	}
+  } else {
+	std::printf("need to wait %d ms to fire\n", fire_ms - usSinceLastFired);
   }
   return ops;
 }

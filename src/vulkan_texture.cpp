@@ -25,6 +25,8 @@ bool Texture::load(){
 							  &texChannels, STBI_rgb_alpha);
   size_t imageSize = imageSize = texWidth * texHeight * 4;
 
+  std::printf("imageSize %d\n", imageSize);
+
   if (!pixels) { // TODO(caleb): Maybe assert instead  of throwing errors?
 	char dst[500];
 	// TODO(caleb): get rid of std::string
