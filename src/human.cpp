@@ -17,7 +17,7 @@ static int FIRE_RATE_BLESSED = 120; // per second
 static float MOVEMENT_RATE_REGULAR = 0.000003; // * dt
 static float MOVEMENT_RATE_BLESSED = 0.000005; // * dt
 
-static float KILL_RADIUS = 0.000001;
+static float KILL_RADIUS = 0.001;
 
 static std::chrono::duration DEATH_ANIMATION_DURATION = 500ms;
 
@@ -42,7 +42,7 @@ GameOps Human::update(std::chrono::microseconds dt, GameState &gameState){
   int fire_rate = (blessed) ? FIRE_RATE_BLESSED : FIRE_RATE_REGULAR;
   float movement_rate = (blessed) ? MOVEMENT_RATE_BLESSED : MOVEMENT_RATE_REGULAR;
 
-  int fire_ms = 1000 / fire_rate;
+  int fire_ms = 100000000 / fire_rate;
 
   if ((usSinceLastFired += dt.count()) > fire_ms) {
 	Location orcLocation = findNearestOrc(gameState);
@@ -120,7 +120,7 @@ GameOp Human::fireAtOrc(Location location, GameState &gameState) {
 }
 
 GameOps Human::kill(GameState &gameState) {
-  auto death_animation = new Animation(position, HUMAN_DEAD_GUID, HUMAN_DEAD_TEXTURE_GUID,
+  auto death_animation = new Animation(position, HUMAN_DEAD_TEXTURE_GUID, HUMAN_DEAD_GUID,
 									   DEATH_ANIMATION_DURATION, gameState.assetStore);
 
   return { { Spawn_e, death_animation },

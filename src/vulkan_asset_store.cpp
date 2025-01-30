@@ -219,7 +219,7 @@ Texture *AssetStore::getTexture(skyGUID guid) {
   try {
 	info = assetDb.at(guid);
 	if (info.type != Texture_e) {
-	  std::printf("Got bad GUID %s \n", guid);
+	  std::printf("Got bad GUID %s \n", guid.c_str());
 	}
 	assert(info.type == Texture_e);
   } catch (const std::out_of_range& ex) {

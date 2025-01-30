@@ -14,11 +14,11 @@ SDG                                                                             
 static float MOVEMENT_RATE_REGULAR = 0.00001; // * dt
 static float MOVEMENT_RATE_SUPER = 0.000005; // * dt
 
-static float HIT_RADIUS_REGULAR = 0.000001;
-static float HIT_RADIUS_SUPER = 0.000005;
+static float HIT_RADIUS_REGULAR = 0.01;
+static float HIT_RADIUS_SUPER = 0.05;
 
-static float KILL_RADIUS_REGULAR = 0.00001;
-static float KILL_RADIUS_SUPER = 0.00001;
+static float KILL_RADIUS_REGULAR = HIT_RADIUS_REGULAR * 2;
+static float KILL_RADIUS_SUPER = HIT_RADIUS_SUPER * 3;
 
 static std::chrono::duration EXPLOSION_DURATION = 500ms; 
 
@@ -70,7 +70,7 @@ std::vector<GameOp> Bullet::update(std::chrono::microseconds dt, GameState &game
 	}
 	ops.push_back(GameOp{ .type = DeleteSelf_e, .operand = this });
 
-	auto explosion = new Animation(position, explosion_meshId, explosion_texId,
+	auto explosion = new Animation(position, explosion_texId, explosion_meshId,
 								   EXPLOSION_DURATION, gameState.assetStore);
 	ops.push_back(GameOp{ Spawn_e, explosion });
   }

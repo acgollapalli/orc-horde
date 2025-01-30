@@ -14,7 +14,7 @@ Animation::Animation(skyVec3 position, skyGUID textureId, skyGUID meshId,
   : GameObject(position)
   , timeLeft(0)
   , rotation(skyQuat::unitVec())
-  , scale(1.0f)
+  , scale(0.1f) // NOTE: hardcoded here because it should work fine
 {
   // TODO(caleb): we may need to handle the case later on that we may pass in
   // a guid that does not return that type
