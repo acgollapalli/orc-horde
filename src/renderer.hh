@@ -26,6 +26,12 @@ SDG                                                                          JJ
 
 #include "vendor/stb_image.h"
 
+typedef GLFWwindow* Window;
+typedef GLFWcursor* Cursor;
+
+typedef void *(CursorPositionCallback)(GLFWwindow* window, double xpos, double ypos);
+typedef void *(MouseButtonCallback)(GLFWwindow *window, int button, int action, int mods);
+
 const float WORLD_TOP_COORD = 5.4;
 const float WORLD_RIGHT_COORD = 12.0;
 
@@ -226,9 +232,7 @@ public:
 						  VkBuffer &vertexBuffer, VkDeviceMemory &vertexBufferMemory);
   void createIndexBuffer(std::vector<Index> indices,
 						 VkBuffer &indexBuffer, VkDeviceMemory &indexBufferMemory);
-  BufferSlice writeInstanceBuffer(std::vector<Instance> instances);
-  // TODO(caleb): handle case where instancebuffer is too small.
-  // TODO(caleb): adjust to account for double and triple buffering.
+  BufferSlice writeInstanceBuffer(std::vector<Instance> instances); // TODO(caleb): handle case where instancebuffer is too small.
   void drawFrame(std::vector<RenderOp> renderOps);
   void destroyBuffer(VkBuffer buffer);
   void freeMemory(VkDeviceMemory memory);
@@ -238,6 +242,12 @@ public:
 						  VkImage &textureImage, VkDeviceMemory &textureImageMemory,
 						  VkImageView &textureImageView);
   void addTextureImageToDescriptorSet(VkImageView &imageView, uint32_t &offset);
+
+  // NOTE(caleb): Depending on when these get called, we may be able to have them simply cache objects which are then returned to the game via getInput()
+  void setCursorMovementCallback(GLFWcursor *cursor, CursorPositionCallback cursorPositionCallback);
+  void setMouseButtonCallback(MouseButtonCallback mouseButtonCallback);
+
+  GLFWcursor *createCursor(unsigned char pixels[16*16*4]);
 
   
 private:
@@ -352,14 +362,14 @@ private:
   bool hasStencilComponent(VkFormat format);
   void generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
   VkSampleCountFlagBits getMaxUsableSampleCount();
-void Renderer::createGraphicsPipeline(const std::string &vertShader,
-									  const std::string &fragShader,
-									  const std::vector<VkVertexInputBindingDescription> bindingDescriptions,
-									  const std::vector<VkVertexInputAttributeDescription> attributeDescriptions,
-									  
-									  VkPipelineLayout &pipelineLayout,
-									  VkPipeline &graphicsPipeline);
-
+  void Renderer::createGraphicsPipeline(const std::string &vertShader,
+										const std::string &fragShader,
+										const std::vector<VkVertexInputBindingDescription> bindingDescriptions,
+										const std::vector<VkVertexInputAttributeDescription> attributeDescriptions,
+										
+										VkPipelineLayout &pipelineLayout,
+										VkPipeline &graphicsPipeline);
+  
 };
 
 const std::vector<const char *> validationLayers = {

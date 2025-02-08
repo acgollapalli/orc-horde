@@ -11,17 +11,31 @@ If you clear the area completely, you get a few days of peace, but then, the orc
 Missions of 5 minutes max. Should be no longer than a game of overwatch or marvel rivals.
 As you the player get better, you get flashier bigger badder guns and melee weapons.
 
+** Mode 1:
+AI fights AI
+In this mode the humans fight the orcs for territory. You can bless the humans by clicking on them and they will increase their rate of fire and fire super bullets
+** Mode 2:
+You join the fight.
+In mode 2, the mini-rogue-mode, you possess a human and fight the orcs yourself. Has first person shooter mode, with a VERY large grenade launcher and a machine gun mode.
+
+* Current Status:
+Vulkan backend is basically done.
+WebGPU backend wasn't able to be completed due to time.
+Input is not done.
+First person camera transport is not done.
+Sound is not done.
+This game is essentially an idle game right now. But I built it in vulkan, from hello triangle, in C++ with assets I made in blender, and textures made via the paint bucket in Microsoft Paint. It's an achievement for me.
 
 
 * Tasks:
 ** DONE Hello Triangle
 ** DONE Loading Meshes into AssetDB
 ** DONE Instanced Rendering of Meshes
-** KNOWNCAUSE Rotation
+** FIXED Rotation
 We can rotate, but we may have messed up the handedness of our meshes somehow.
 ** BUG Game crashes on resize
-** INPROGRESS Figure out how to get textures for different meshes
-** BUG Map texture is mirrored
+** DONE Figure out how to get textures for different meshes
+** FIXED Map texture is mirrored
 maybe an export problem?
 ** TEST World Space to Screen Space Coordinates.
 *** DONE Top down view
@@ -33,7 +47,7 @@ May not be feasible. Will need to test. But it will have right handed coordinate
 ** TODO Input
 ** TODO Tiles
 ** TODO Player Interface
-** TODO Core Game Loop
+** INPROGRESS Core Game Loop
 ** TODO Switch to SDL
 ** TODO WebGPU Backend
 ** HOLD Music

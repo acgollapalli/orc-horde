@@ -116,13 +116,13 @@ public:
   void                  move(std::chrono::microseconds dt, skyVec3 dv, skyVec3 dw);
   bool 					load();
   GameOps				kill(GameState &gameState); // TODO(caleb): add death animation
+  bool					blessed; // TODO(caleb): have this be handled by a click method
 private:
   // TODO(caleb): add private copy constructor
   skyQuat               rotation;
   float 				scale;
   Mesh *				mesh;
   Texture *				texture;
-  bool					blessed;
   int					usSinceLastFired;
   Location				findNearestOrc(GameState &gameState);
   GameOp				fireAtOrc(Location location, GameState &gameState);

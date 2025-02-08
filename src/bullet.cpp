@@ -47,8 +47,8 @@ std::vector<GameOp> Bullet::update(std::chrono::microseconds dt, GameState &game
   float hit_radius = superBullet ? HIT_RADIUS_SUPER : HIT_RADIUS_REGULAR;
   float kill_radius = superBullet ? KILL_RADIUS_SUPER : KILL_RADIUS_REGULAR;
 
-  skyGUID explosion_meshId= superBullet ? EXPLOSION_GUID : SUPER_EXPLOSION_GUID;
-  skyGUID explosion_texId= superBullet ? EXPLOSION_TEXTURE_GUID : SUPER_EXPLOSION_TEXTURE_GUID;
+  skyGUID explosion_meshId= superBullet ?  SUPER_EXPLOSION_GUID : EXPLOSION_GUID;
+  skyGUID explosion_texId= superBullet ? SUPER_EXPLOSION_TEXTURE_GUID : EXPLOSION_TEXTURE_GUID;
 
   bool outOfBounds = position.y > WORLD_TOP_COORD ||
 	                 position.y < -WORLD_TOP_COORD ||

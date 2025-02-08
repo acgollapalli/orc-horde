@@ -1928,3 +1928,32 @@ void Renderer::destroyImage(VkImage image) {
 void Renderer::destroyImageView(VkImageView imageView) {
     vkDestroyImageView(device, imageView, nullptr);
 }
+
+
+void Renderer::setCursorMovementCallback(GLFWcursor *cursor,
+										  CursorPositionCallback cursorPositionCallback){
+  if (cursor != nullptr) {
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetCursor(window, cursor);
+  } else {
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwRawMouseMotionSupported()) { // TODO(caleb): handle case where raw mouse motion is not supported
+	  glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	}
+  }
+  glfwSetCursorPosCallback(window, reinterpret_cast<GLFWcursorposfun>(cursorPositionCallback));
+}
+
+
+void Renderer::setMouseButtonCallback(MouseButtonCallback mouseButtonCallback){
+  glfwSetMouseButtonCallback(window, mouseButtonCallback);
+}
+
+GLFWcursor *Renderer::createCursor(unsigned char pixels[16*16*4]) {
+  GLFWimage image;
+  image.width = 16;
+  image.height = 16;
+  image.pixels = pixels;
+
+  return glfwCreateCursor(&image, 0, 0);
+}

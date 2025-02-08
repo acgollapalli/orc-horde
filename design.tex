@@ -1,0 +1,106 @@
+% Created 2025-01-31 Fri 07:09
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\author{Caleb Gollapalli}
+\date{\today}
+\title{Orc Horde Design Doc}
+\hypersetup{
+ pdfauthor={Caleb Gollapalli},
+ pdftitle={Orc Horde Design Doc},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 30.0.91 (Org mode 9.7.11)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Summary:}
+\label{sec:orgb459322}
+A Mini-Rogue-Like in which you go fight the orcs, one mission at a time.
+Every mission pushes the orcs a little further back, but after you level up, the orcs come back to fight against you harder than ever.
+The longer you go without a mission in real time, the more the orc's will overrun you.
+If you clear the area completely, you get a few days of peace, but then, the orcs will come back with a vengeance, and they never stop.
+\section{Gameplay loop:}
+\label{sec:org5da6ee9}
+Missions of 5 minutes max. Should be no longer than a game of overwatch or marvel rivals.
+As you the player get better, you get flashier bigger badder guns and melee weapons.
+\subsection{Mode 1:}
+\label{sec:orgb47cbdd}
+AI fights AI
+In this mode the humans fight the orcs for territory. You can bless the humans by clicking on them and they will increase their rate of fire and fire super bullets
+\subsection{Mode 2:}
+\label{sec:orgf7503cb}
+You join the fight.
+In mode 2, the mini-rogue-mode, you possess a human and fight the orcs yourself. Has first person shooter mode, with a VERY large grenade launcher and a machine gun mode.
+\section{Current Status:}
+\label{sec:org160c03d}
+Vulkan backend is basically done.
+WebGPU backend wasn't able to be completed due to time.
+Input is not done.
+First person camera transport is not done.
+Sound is not done.
+This game is essentially an idle game right now. But I built it in vulkan, from hello triangle, in C++ with assets I made in blender, and textures made via the paint bucket in Microsoft Paint. It's an achievement for me.
+\section{Tasks:}
+\label{sec:org05a9c58}
+\subsection{{\bfseries\sffamily DONE} Hello Triangle}
+\label{sec:org97152ab}
+\subsection{{\bfseries\sffamily DONE} Loading Meshes into AssetDB}
+\label{sec:orgd5716c7}
+\subsection{{\bfseries\sffamily DONE} Instanced Rendering of Meshes}
+\label{sec:orgd9b5ba1}
+\subsection{{\bfseries\sffamily FIXED} Rotation}
+\label{sec:org57a7566}
+We can rotate, but we may have messed up the handedness of our meshes somehow.
+\subsection{{\bfseries\sffamily BUG} Game crashes on resize}
+\label{sec:org7730a3f}
+\subsection{{\bfseries\sffamily DONE} Figure out how to get textures for different meshes}
+\label{sec:org026455b}
+\subsection{{\bfseries\sffamily FIXED} Map texture is mirrored}
+\label{sec:org151b6d1}
+maybe an export problem?
+\subsection{{\bfseries\sffamily TEST} World Space to Screen Space Coordinates.}
+\label{sec:org85cbee6}
+\subsubsection{{\bfseries\sffamily DONE} Top down view}
+\label{sec:org5f14bd2}
+Our world is approx 8 units tall and 10.8 units wide
+orcs will stream in from (x, 4) for now
+\subsubsection{{\bfseries\sffamily TODO} FPS view}
+\label{sec:org09deab5}
+May not be feasible. Will need to test. But it will have right handed coordinates.
+\subsection{{\bfseries\sffamily TODO} Input}
+\label{sec:org89d427c}
+\subsection{{\bfseries\sffamily TODO} Tiles}
+\label{sec:orga1e9fc7}
+\subsection{{\bfseries\sffamily TODO} Player Interface}
+\label{sec:org5b70db4}
+\subsection{{\bfseries\sffamily INPROGRESS} Core Game Loop}
+\label{sec:orgd73fb59}
+\subsection{{\bfseries\sffamily TODO} Switch to SDL}
+\label{sec:org71a61b2}
+\subsection{{\bfseries\sffamily TODO} WebGPU Backend}
+\label{sec:org6af0b96}
+\subsection{{\bfseries\sffamily HOLD} Music}
+\label{sec:orgd6f1e2d}
+\subsection{{\bfseries\sffamily TODO} Loading Textures into AssetDB}
+\label{sec:orgad069da}
+
+\subsection{{\bfseries\sffamily TODO} Long period of white window due to assets loading.}
+\label{sec:orgdda62ba}
+Because we're loading assets into the thing dynamically we don't actually start rendering frames
+til after we've at least read the map file.
+
+We need to have SOMETHING display while files are loading. May mean that we simply paint a loading screen and then init the game state. 
+\end{document}

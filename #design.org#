@@ -1,0 +1,61 @@
+#+TITLE: Orc Horde Design Doc
+#+AUTHOR: Caleb Gollapalli
+
+* Summary:
+A Mini-Rogue-Like in which you go fight the orcs, one mission at a time.
+Every mission pushes the orcs a little further back, but after you level up, the orcs come back to fight against you harder than ever.
+The longer you go without a mission in real time, the more the orc's will overrun you.
+If you clear the area completely, you get a few days of peace, but then, the orcs will come back with a vengeance, and they never stop.
+
+* Gameplay loop:
+Missions of 5 minutes max. Should be no longer than a game of overwatch or marvel rivals.
+As you the player get better, you get flashier bigger badder guns and melee weapons.
+
+** Mode 1:
+AI fights AI
+In this mode the humans fight the orcs for territory. You can bless the humans by clicking on them and they will increase their rate of fire and fire super bullets. (Demo video has all humans in blessed state) 
+** Mode 2:
+You join the fight.
+In mode 2, the mini-rogue-mode, you possess a human and fight the orcs yourself. Has first person shooter mode, with a VERY large grenade launcher and a machine gun mode.
+
+
+* Current Status:
+Vulkan backend is basically done.
+WebGPU backend wasn't able to be completed due to time.
+Input is not done.
+First person camera transport is not done.
+Sound is not done.
+This game is essentially an idle game right now. But I built it in vulkan, from hello triangle, in C++ with assets I made in blender, and textures made via the paint bucket in Microsoft Paint. It's an achievement for me.
+
+
+* Tasks:
+** DONE Hello Triangle
+** DONE Loading Meshes into AssetDB
+** DONE Instanced Rendering of Meshes
+** FIXED Rotation
+We can rotate, but we may have messed up the handedness of our meshes somehow.
+** BUG Game crashes on resize
+** DONE Figure out how to get textures for different meshes
+** FIXED Map texture is mirrored
+maybe an export problem?
+** TEST World Space to Screen Space Coordinates.
+*** DONE Top down view
+Our world is approx 8 units tall and 10.8 units wide
+orcs will stream in from (x, 4) for now
+*** TODO FPS view
+May not be feasible. Will need to test. But it will have right handed coordinates.
+
+** TODO Input
+** TODO Tiles
+** TODO Player Interface
+** INPROGRESS Core Game Loop
+** TODO Switch to SDL
+** TODO WebGPU Backend
+** HOLD Music
+** TODO Loading Textures into AssetDB
+
+** TODO Long period of white window due to assets loading.
+Because we're loading assets into the thing dynamically we don't actually start rendering frames
+til after we've at least read the map file.
+
+We need to have SOMETHING display while files are loading. May mean that we simply paint a loading screen and then init the game state. 

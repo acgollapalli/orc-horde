@@ -112,6 +112,8 @@ void spawnHumans(GameState &gameState) {
 	  float x_rand = distribution(generator);
 
 	  GameObject *human = new Human(skyVec3(x_rand, -2.4, 0.0), gameState.assetStore);
+	  Human *human_ = static_cast<Human*>(human); // only for demo purposes
+	  human_->blessed = true; // only for demo purposes
 
 	  gameState.gameObjects.push_back(human);
 	}
@@ -154,6 +156,14 @@ void drawDemoFrame(Renderer &renderer, GameState &gameState, std::chrono::durati
   renderer.drawFrame(ops);
 }
 
+static void handleCursorMovement(Window window, double xpos, double ypos) {
+  std::printf("Moving to %d, %d", xpos, ypos);
+}
+
+static void handleMouseButton(Window window, int button, int action, int mods) {
+  std::printf("Mouse Button Pressed, %d, %d, %d", button, action, mods);
+}
+
 
 int main (int argc, char *argv[]) {
   Renderer renderer;
@@ -162,6 +172,10 @@ int main (int argc, char *argv[]) {
 
 	renderer.initWindow();
     renderer.initGraphics();
+
+	// TODO(caleb): createCursor here once we load the cursor sprite
+	renderer.setCursorMovementCallback(glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR), (CursorPositionCallback)handleCursorMovement);
+	renderer.setMouseButtonCallback((MouseButtonCallback)handleMouseButton);
 
 	GameState gameState = initGameState(renderer);
 
